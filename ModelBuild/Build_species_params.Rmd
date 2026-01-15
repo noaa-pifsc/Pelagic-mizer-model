@@ -1,0 +1,105 @@
+---
+title: "Build_species_params"
+output: html_document
+---
+
+# Purpose
+The purpose of this script is to build the species parameters data frame and to 
+keep track of references at the same time.
+
+```{r, message = FALSE} 
+# In the above line, `message = FALSE` suppresses some ignorable R messages
+# You can delete `, message = FALSE` if you want to see the messages
+
+# Set up the workspace
+library(tidyverse, quietly = TRUE) # handy for working with data frames
+library(here) # file path management that works on any operating system
+```
+
+# Initial data frames
+This code builds the initial empty data frames.  Start here if you're starting 
+from scratch.  If you want to add new information, skip down to the section on 
+updating the data frames.
+```{r}
+# Build empty data frames 
+species_params <- data.frame(matrix(nrow = 1, ncol = 2,
+                                    dimnames = list(NULL, c("species",
+                                                            "w_max"))))
+
+species_params_refs <- data.frame(matrix(nrow = 1, ncol = 2,
+                                         dimnames = list(NULL, c("species",
+                                                                 "w_max"))))
+
+# Add the first species to each, picking one we're certain to use
+species_params$species[1] <- c("BigeyeTuna")
+species_params_refs$species[1] <- c("BigeyeTuna")
+```
+
+
+# Update the data frames with parameters
+This code lets you add information to the data frames.  Start here if you're 
+loading the partially built parameters and adding to them.
+
+First, create functions to make it easier to add information:
+```{r}
+add_new_species <- function(df_to_update, species_name) {
+  # Add an empty row with the correct number of columns
+  new_row <- rep(NA, dim(df_to_update)[2])
+  df_to_update <- rbind(df_to_update, new_row)
+  
+  # Add new species name
+  df_to_update$species[dim(df_to_update)[1]] <- species_name
+  
+  # Return updated parameters
+  return(df_to_update)
+}
+
+add_param_info <- function(df_to_update, species_name, parameter_name, new_info) {
+  # Find the row for the species we want
+  rowID <- which(df_to_update$species == species_name)
+  
+  # Find the column we want to update
+  colID <- which(dimnames(df_to_update)[[2]] == parameter_name)
+  
+  # Update the parameter
+  df_to_update[rowID, colID] = new_info
+  
+  # Return updated parameters
+  return(df_to_update)
+}
+```
+
+Load the existing parameters:
+```{r}
+# To be written
+```
+
+To add a new parameter, use the `mutate` function:
+```{r}
+# Add an empty column with the parameter name.  Here, that's w_mat
+species_params <- species_params |>
+  mutate(w_mat = NA)
+```
+
+Now, use the functions:
+```{r}
+species_params <- add_new_species(species_params, "YellowfinTuna")
+species_params_refs <- add_new_species(species_params_refs, "YellowfinTuna")
+
+species_params <- add_param_info(species_params, "BigeyeTuna", "w_max", 500)
+```
+
+# Save the updated parameters
+If you're happy with your work and want to make it available to the team, save
+the new parameter table(s) using the code below.  Remember to push the changes
+to the repo.  Otherwise, they'll only live on your computer.
+```{r}
+# To be written
+```
+
+# Still to add
+The idea for the `_refs` data frame is to keep track of the reference for each
+parameter.  In a perfect world, we'd populate the data frame with the tags from 
+the references.bib table.  But this works best with newer papers.  So, we can 
+also populate with citation strings (e.g., Smith et al. 2025).  Still to figure 
+out: the best place to record the full citations.  
