@@ -1,0 +1,100 @@
+---
+title: "FisheryCharacteristics_maps"
+---
+
+# Purpose
+The purpose of this script is to examine the characteristics of the Hawaii-based
+longline fisheries.  We'll look specifically at:  
+
+* fishery footprints  
+* possibly some other stuff
+
+```{r}
+# Set up work space
+library(tidyverse, quietly = TRUE) # for working with data frames
+library(here) # file path management
+library(maps) # for mapping
+```
+
+```{r}
+# Load data
+ObsSets <- readRDS(here("ModelBuild", "FisheryData", "Obs_Details_HIonly.rds"))
+```
+
+```{r}
+# Data wrangling to make things easier
+
+# Add a year column, just to make things easier.  
+# Remove the experimental trip type column, since it's always NA
+ObsSets <- ObsSets |>
+  mutate(YEAR = year(HAUL_BEGIN_DATETIME),
+         EXPR_TRIP_TYPE_ID = NULL)
+
+# Restrict ourselves to 1995 - 2024
+# First year when logbooks noted deep vs. shallow
+# Latest full year
+Obs9524 <- ObsSets |>
+  filter(YEAR >= 1995 & YEAR <= 2024)
+
+# Convert to 360-deg longitude
+neg_lon <- which(Obs9524$HAUL_BEGIN_LON < 0)
+Obs9524$HAUL_BEGIN_LON[neg_lon] <- Obs9524$HAUL_BEGIN_LON[neg_lon] + 360
+```
+
+```{r}
+# Shallow-set map
+
+# Filter to shallow sets only
+Obs9524_Shallow <- Obs9524 |>
+  filter(HKS_PER_FLT < 15)
+
+# Map
+shallow_map <- ggplot() +
+  geom_point(data = Obs9524_Shallow, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#5EB6D9") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  borders("world2", fill = "#A5AAAF") 
+
+# Save 
+png(here("ModelBuild", "FisheryData", "ShallowSetMap.png"), bg = "transparent")
+shallow_map
+dev.off()
+```
+
+```{r}
+# Deep-set map
+
+# Filter to shallow sets only
+Obs9524_Deep <- Obs9524 |>
+  filter(HKS_PER_FLT >= 15)
+
+# Map
+deep_map <- ggplot() +
+  geom_point(data = Obs9524_Deep, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#003087") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  borders("world2", fill = "#A5AAAF") 
+
+# Save 
+png(here("ModelBuild", "FisheryData", "DeepSetMap.png"), bg = "transparent")
+deep_map
+dev.off()
+```
+
+```{r}
+# Combine into a single map
+# Map
+combined_map <- ggplot() +
+  geom_point(data = Obs9524_Deep, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#003087") +
+  geom_point(data = Obs9524_Shallow, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#5EB6D9") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  borders("world2", fill = "#A5AAAF")
+
+# Save 
+png(here("ModelBuild", "FisheryData", "CombinedMap.png"), bg = "transparent")
+combined_map
+dev.off()
+```
+
