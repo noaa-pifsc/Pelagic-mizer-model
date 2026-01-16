@@ -6,7 +6,6 @@ title: "FisheryCharacteristics"
 The purpose of this script is to examine the characteristics of the Hawaii-based
 longline fisheries.  We'll look specifically at:  
 
-* fishery footprints (deep- and shallow-set)  
 * rank-order of species caught  
 * possibly some other stuff
 
