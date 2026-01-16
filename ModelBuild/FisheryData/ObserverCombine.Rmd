@@ -48,11 +48,18 @@ ObsCatch_withDetails_allSets <- inner_join(Catch, ObservedSetDetails_allSets,
 # experimental trips (we want trips with no experimental trip code)
 ObsCatch_Details_HIonly <- ObsCatch_withDetails_allSets |>
   filter(str_starts(TRIP_NUM, "LL") & is.na(EXPR_TRIP_TYPE_ID))
+
+# Keep a record with just set-level details, to make mapping easier
+Obs_Details_HIonly <- ObservedSetDetails_allSets |>
+  filter(str_starts(TRIP_NUM, "LL") & is.na(EXPR_TRIP_TYPE_ID))
 ```
 
 ```{r}
 # Save output in two different formats
 saveRDS(object = ObsCatch_Details_HIonly, file = here("ModelBuild", "FisheryData", "ObsCatch_Details_HIonly.rds"))
 write_csv(ObsCatch_Details_HIonly, file = here("ModelBuild", "FisheryData", "ObsCatch_Details_HIonly.csv"))
+
+saveRDS(object = Obs_Details_HIonly, file = here("ModelBuild", "FisheryData", "Obs_Details_HIonly.rds"))
+write_csv(Obs_Details_HIonly, file = here("ModelBuild", "FisheryData", "Obs_Details_HIonly.csv"))
 ```
 
