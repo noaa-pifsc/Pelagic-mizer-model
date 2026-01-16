@@ -90,6 +90,10 @@ Rib <- str_detect(SpeciesNames$ENGLISH_NAME, "RIBBON")
 Rib_idx <- which(Obs9524$SPECIES_CODE == 148 | Obs9524$SPECIES_CODE == 147)
 Obs9524$Grouped_SPECIES_CODES[Rib_idx] = 148147
 
+# Opah/Lampris sp
+Opa <- str_detect(SpeciesNames$ENGLISH_NAME, "OPAH")
+Lam <- str_detect(SpeciesNames$ENGLISH_NAME, "LAMP")
+
 # Copy over remaining single-species codes
 Single_idx <- which(is.na(Obs9524$Grouped_SPECIES_CODE))
 Obs9524$Grouped_SPECIES_CODES[Single_idx] <- Obs9524$SPECIES_CODE[Single_idx]
@@ -152,7 +156,39 @@ RankedCatch_AllYears_ShallowSet <- RankedCatch_AllYears_ShallowSet |>
   mutate(PropCatch = n / n_shallow)
 
 # Save
-write_csv(RankedCatch_AllYears_ShallowSet, "RankedCatch_AllYears_ShallowSet.csv")
+# write_csv(RankedCatch_AllYears_ShallowSet, "RankedCatch_AllYears_ShallowSet.csv")
+```
+
+```{r}
+### Deep-set
+# Rank order of species caught
+# All years combined
+RankedCatch_AllYears_DeepSet <- Obs9524 |>
+  filter(HKS_PER_FLT >= 15) |>
+  count(Grouped_SPECIES_CODES, sort = TRUE)
+
+# Match up the rankings with species names
+# Append the name column
+RankedCatch_AllYears_DeepSet <- full_join(RankedCatch_AllYears_DeepSet, SpeciesNames,
+                                               by = c("Grouped_SPECIES_CODES" = "NEW_SPECIES_CODE")) |>
+  mutate(OLD_SPECIES_CODE = NULL,
+         NEW_SPECIES_CODE = NULL,
+         SPECIES_GROUPING = NULL,
+         LODS_DISPLAY_NAME = NULL)
+
+# Number of shallow sets
+n_deep <- length(which(Obs9524$HKS_PER_FLT >= 15))
+
+# Filter to just those that comprise > 0.001 observed catch
+RankedCatch_AllYears_DeepSet <- RankedCatch_AllYears_DeepSet |>
+  filter(n > n_deep*0.001)
+
+# Add a column that's the proportion of observed catch
+RankedCatch_AllYears_DeepSet <- RankedCatch_AllYears_DeepSet |>
+  mutate(PropCatch = n / n_deep)
+
+# Save
+write_csv(RankedCatch_AllYears_DeepSet, "RankedCatch_AllYears_DeepSet.csv")
 ```
 
 ```{r}
