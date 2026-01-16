@@ -1,0 +1,166 @@
+---
+title: "FisheryCharacteristics"
+---
+
+# Purpose
+The purpose of this script is to examine the characteristics of the Hawaii-based
+longline fisheries.  We'll look specifically at:  
+
+* fishery footprints (deep- and shallow-set)  
+* rank-order of species caught  
+* possibly some other stuff
+
+```{r}
+# Set up work space
+library(tidyverse, quietly = TRUE) # for working with data frames
+library(here) # file path management
+```
+
+```{r}
+# Load data
+ObsCatch <- readRDS(here("ModelBuild", "FisheryData", "ObsCatch_Details_HIonly.rds"))
+
+# Load species names
+SpeciesNames <- read_csv(here("ModelBuild", "FisheryData", "ObserverSpeciesCodes.csv"), show_col_types = FALSE)
+```
+
+```{r}
+# Data wrangling to make things easier
+
+# Add a year column, just to make things easier.  
+# Remove the experimental trip type column, since it's always NA
+ObsCatch <- ObsCatch |>
+  mutate(YEAR = year(HAUL_BEGIN_DATETIME),
+         EXPR_TRIP_TYPE_ID = NULL)
+
+# Restrict ourselves to 1995 - 2024
+# First year when logbooks noted deep vs. shallow
+# Latest full year
+Obs9524 <- ObsCatch |>
+  filter(YEAR >= 1995 & YEAR <= 2024)
+```
+
+```{r}
+### Combine species
+# Confirm that old and new codes are the same
+test_codes <- which(SpeciesNames$OLD_SPECIES_CODE != SpeciesNames$NEW_SPECIES_CODE)
+SpeciesNames[test_codes,] # a single fish we don't really catch (driftfish)
+
+# Add a new empty column of grouped codes 
+# Populate it with combined codes first
+# Fill it with the single codes for remaining species
+Obs9524 <- Obs9524 |>
+  mutate(Grouped_SPECIES_CODES = NA)
+
+# Lancetfish
+# Species coded as shortnose lancetfish are erroneously coded longnose lancetfish
+Lct <- str_detect(SpeciesNames$ENGLISH_NAME, "LANCET")
+Lct_idx <- which(Obs9524$SPECIES_CODE == 122 | Obs9524$SPECIES_CODE == 121)
+Obs9524$Grouped_SPECIES_CODES[Lct_idx] = 122121
+
+# Mahi/Dolphinfish
+Mhi <- str_detect(SpeciesNames$ENGLISH_NAME, "MAHI")
+Dol <- str_detect(SpeciesNames$ENGLISH_NAME, "DOLPHIN")
+MhiDol_idx <- which(Obs9524$SPECIES_CODE == 218 | Obs9524$SPECIES_CODE == 219)
+Obs9524$Grouped_SPECIES_CODES[MhiDol_idx] = 218219
+
+# Pomfrets
+Pom <- str_detect(SpeciesNames$ENGLISH_NAME, "POMFRET")
+Pom_idx <- which(Obs9524$SPECIES_CODE == 180 | Obs9524$SPECIES_CODE == 189 | 
+                 Obs9524$SPECIES_CODE == 188 | Obs9524$SPECIES_CODE == 187 | 
+                 Obs9524$SPECIES_CODE == 185 | Obs9524$SPECIES_CODE == 183 | 
+                 Obs9524$SPECIES_CODE == 184 | Obs9524$SPECIES_CODE == 186)
+Obs9524$Grouped_SPECIES_CODES[Pom_idx] = 180189188187185183184186
+
+# Escolar/Oilfish
+Esc <- str_detect(SpeciesNames$ENGLISH_NAME, "ESCOLAR")
+Oil <- str_detect(SpeciesNames$ENGLISH_NAME, "OIL")
+EscOil_idx <- which(Obs9524$SPECIES_CODE == 191 | Obs9524$SPECIES_CODE == 197 |
+                    Obs9524$SPECIES_CODE == 192)
+Obs9524$Grouped_SPECIES_CODES[EscOil_idx] = 191197192
+
+# Molas
+Mol <- str_detect(SpeciesNames$ENGLISH_NAME, "MOLA")
+Mol_idx <- which(Obs9524$SPECIES_CODE == 315 | Obs9524$SPECIES_CODE == 316 |
+                 Obs9524$SPECIES_CODE == 317)
+Obs9524$Grouped_SPECIES_CODES[Mol_idx] = 315316317
+
+# Ribbonfish
+Rib <- str_detect(SpeciesNames$ENGLISH_NAME, "RIBBON")
+Rib_idx <- which(Obs9524$SPECIES_CODE == 148 | Obs9524$SPECIES_CODE == 147)
+Obs9524$Grouped_SPECIES_CODES[Rib_idx] = 148147
+
+# Copy over remaining single-species codes
+Single_idx <- which(is.na(Obs9524$Grouped_SPECIES_CODE))
+Obs9524$Grouped_SPECIES_CODES[Single_idx] <- Obs9524$SPECIES_CODE[Single_idx]
+```
+
+
+```{r}
+# Rank order of species caught
+# All years combined
+RankedCatch_AllYears_AllFisheries <- Obs9524 |>
+  count(Grouped_SPECIES_CODES, sort = TRUE)
+
+# Match up the rankings with species names
+# Append the name column
+RankedCatch_AllYears_AllFisheries <- full_join(RankedCatch_AllYears_AllFisheries, SpeciesNames,
+                                               by = c("Grouped_SPECIES_CODES" = "NEW_SPECIES_CODE")) |>
+  mutate(OLD_SPECIES_CODE = NULL,
+         NEW_SPECIES_CODE = NULL,
+         SPECIES_GROUPING = NULL,
+         LODS_DISPLAY_NAME = NULL)
+
+# Filter to just those that comprise > 0.001 observed catch
+RankedCatch_AllYears_AllFisheries <- RankedCatch_AllYears_AllFisheries |>
+  filter(n > dim(Obs9524)[1]*0.001)
+
+# Add a column that's the proportion of observed catch
+RankedCatch_AllYears_AllFisheries <- RankedCatch_AllYears_AllFisheries |>
+  mutate(PropCatch = n / dim(Obs9524)[1])
+
+# Save
+# write_csv(RankedCatch_AllYears_AllFisheries, "RankedCatch_AllYears_AllFisheries.csv")
+```
+
+```{r}
+### Shallow-set
+# Rank order of species caught
+# All years combined
+RankedCatch_AllYears_ShallowSet <- Obs9524 |>
+  filter(HKS_PER_FLT < 15) |>
+  count(Grouped_SPECIES_CODES, sort = TRUE)
+
+# Match up the rankings with species names
+# Append the name column
+RankedCatch_AllYears_ShallowSet <- full_join(RankedCatch_AllYears_ShallowSet, SpeciesNames,
+                                               by = c("Grouped_SPECIES_CODES" = "NEW_SPECIES_CODE")) |>
+  mutate(OLD_SPECIES_CODE = NULL,
+         NEW_SPECIES_CODE = NULL,
+         SPECIES_GROUPING = NULL,
+         LODS_DISPLAY_NAME = NULL)
+
+# Number of shallow sets
+n_shallow <- length(which(Obs9524$HKS_PER_FLT < 15))
+
+# Filter to just those that comprise > 0.001 observed catch
+RankedCatch_AllYears_ShallowSet <- RankedCatch_AllYears_ShallowSet |>
+  filter(n > n_shallow*0.001)
+
+# Add a column that's the proportion of observed catch
+RankedCatch_AllYears_ShallowSet <- RankedCatch_AllYears_ShallowSet |>
+  mutate(PropCatch = n / n_shallow)
+
+# Save
+write_csv(RankedCatch_AllYears_ShallowSet, "RankedCatch_AllYears_ShallowSet.csv")
+```
+
+```{r}
+# Stuff for later
+# Each year
+# RankedCatch_annual <- Obs9524 |>
+#   group_by(YEAR) |>
+#   count(SPECIES_CODE) |>
+#   arrange(YEAR, desc(n))
+```
+
