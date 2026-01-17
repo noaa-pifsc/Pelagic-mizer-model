@@ -1,0 +1,163 @@
+---
+title: "InternationalEffort"
+output: html_document
+---
+
+# Purpose
+The purpose of this script is to map international fishing effort in the 
+Pacific.
+
+```{r}
+# Set up work space
+library(tidyverse, quietly = TRUE) # for working with data frames
+library(here) # file path management
+library(maps) # for mapping
+```
+
+```{r}
+# Load data
+# Longline
+W_LL <- read_csv(here("ModelBuild", "FisheryData", "WCPFC_L_PUBLIC_BY_YY_FLAG",
+                      "WCPFC_L_PUBLIC_BY_YY_FLAG.csv"), show_col_types = FALSE)
+E_LL <- read_csv(here("ModelBuild", "FisheryData", "PublicLLTunaBillfish",
+                     "PublicLLTunaBillfishNum.csv"), show_col_types = FALSE)
+
+# Purse seine
+W_PS <- read_csv(here("ModelBuild", "FisheryData", "WCPFC_S_PUBLIC_BY_YY_FLAG",
+                      "WCPFC_S_PUBLIC_BY_YY_FLAG.csv"), show_col_types = FALSE)
+E_PS <- read_csv(here("ModelBuild", "FisheryData", "PublicPSTuna",
+                      "PublicPSTunaSetType.csv"), show_col_types = FALSE)
+
+# Pole and line
+W_PL <- read_csv(here("ModelBuild", "FisheryData", "WCPFC_P_PUBLIC_BY_YY_MM",
+                      "WCPFC_P_PUBLIC_BY_YY_MM.csv"), show_col_types = FALSE)
+```
+
+```{r}
+# Wrangle data
+# WCPFC locations are a mix of numbers and letters (annoying)
+# Strip out the letters and turn the numbers into positive and negative integers
+north <- str_detect(W_LL$LAT5, "N")
+W_LL$LAT5[north] <- str_sub(W_LL$LAT5[north], end = -2)
+south <- str_detect(W_LL$LAT5, "S")
+W_LL$LAT5[south] <- str_sub(W_LL$LAT5[south], end = -2)
+east <- str_detect(W_LL$LON5, "E")
+W_LL$LON5[east] <- str_sub(W_LL$LON5[east], end = -2)
+west <- str_detect(W_LL$LON5, "W")
+W_LL$LON5[west] <- str_sub(W_LL$LON5[west], end = -2)
+W_LL <- W_LL |>
+  mutate_at(c('LAT5', 'LON5'), as.numeric)
+W_LL$LAT5[south] <- W_LL$LAT5[south] * -1
+W_LL$LON5[west] <- 360 - W_LL$LON5[west]
+rm(north, south, east, west)
+
+north <- str_detect(W_PS$LAT5, "N")
+W_PS$LAT5[north] <- str_sub(W_PS$LAT5[north], end = -2)
+south <- str_detect(W_PS$LAT5, "S")
+W_PS$LAT5[south] <- str_sub(W_PS$LAT5[south], end = -2)
+east <- str_detect(W_PS$LON5, "E")
+W_PS$LON5[east] <- str_sub(W_PS$LON5[east], end = -2)
+west <- str_detect(W_PS$LON5, "W")
+W_PS$LON5[west] <- str_sub(W_PS$LON5[west], end = -2)
+W_PS <- W_PS |>
+  mutate_at(c('LAT5', 'LON5'), as.numeric)
+W_PS$LAT5[south] <- W_PS$LAT5[south] * -1
+W_PS$LON5[west] <- 360 - W_PS$LON5[west]
+
+# Convert to 360 longitude
+E_LL$LonC5 <- E_LL$LonC5 + 360
+E_PS$LonC1 <- E_PS$LonC1 + 360
+
+# Filter out US longline effort, because we can account for that more finely
+# with logbook data
+# Filter to >= 1995 for consistency with HI data (max year is 2024)
+W_LL_intl <- W_LL |>
+  filter(flag_code != "US") |>
+  filter(YY >= 1995)
+
+E_LL_intl <- E_LL |>
+  filter(Flag != "USA") |>
+  filter(Year >= 1995)
+
+W_PS_intl <- W_PS |>
+  filter(YY >= 1995)
+
+E_PS_intl <- E_PS |>
+  filter(Year >= 1995)
+
+# Group by grid point and sum across years
+W_LL_intl_effort <- W_LL_intl |>
+  select(LAT5, LON5, HHOOKS) |>
+  group_by(LAT5, LON5) |>
+  summarise(TotalEffort = sum(HHOOKS))
+
+E_LL_intl_effort <- E_LL_intl |>
+  select(LatC5, LonC5, Hooks) |>
+  group_by(LatC5, LonC5) |>
+  summarise(TotalEffort = sum(Hooks))
+
+W_PS_intl_effort <- W_PS_intl |>
+  select(LAT5, LON5, SETS_UNA, SETS_LOG, SETS_DFAD, SETS_AFAD, SETS_OTH) |>
+  group_by(LAT5, LON5) |>
+  summarise(TotalEffort = sum(SETS_UNA) + sum(SETS_LOG) + sum(SETS_DFAD) + sum(SETS_AFAD) + sum(SETS_OTH))
+
+E_PS_intl_effort <- E_PS_intl |>
+  select(LatC1, LonC1, NumSets) |>
+  group_by(LatC1, LonC1) |>
+  summarise(TotalEffort = sum(NumSets))
+
+# Harmonize units across convention areas, WCPFC is hundreds of hooks
+# Harmonize grid across convention areas, WCPFC is SW corner, IATTC is center
+W_LL_intl_effort$TotalEffort <- W_LL_intl_effort$TotalEffort * 100
+W_LL_intl_effort$LAT5 <- W_LL_intl_effort$LAT5 + 2.5
+W_LL_intl_effort$LON5 <- W_LL_intl_effort$LON5 + 2.5
+W_PS_intl_effort$LAT5 <- W_PS_intl_effort$LAT5 + 2.5
+W_PS_intl_effort$LON5 <- W_PS_intl_effort$LON5 + 2.5
+
+# Rename columns to common names
+W_LL_intl_effort <- W_LL_intl_effort |>
+  rename(Lat = LAT5, Lon = LON5)
+E_LL_intl_effort <- E_LL_intl_effort |>
+  rename(Lat = LatC5, Lon = LonC5)
+
+W_PS_intl_effort <- W_PS_intl_effort |>
+  rename(Lat = LAT5, Lon = LON5)
+E_PS_intl_effort <- E_PS_intl_effort |>
+  rename(Lat = LatC1, Lon = LonC1)
+
+# Combine for mapping
+LL_intl_effort <- rbind(W_LL_intl_effort, E_LL_intl_effort)
+LL_intl_effort <- LL_intl_effort |>
+  group_by(Lat, Lon) |>
+  summarise(TotalEffort = sum(TotalEffort))
+
+# PS_intl_effort <- rbind(W_PS_intl_effort, E_PS_intl_effort)
+# PS_intl_effort <- PS_intl_effort |>
+#   group_by(Lat, Lon) |>
+#   summarise(TotalEffort = sum(TotalEffort))
+```
+
+```{r}
+# Map
+Intl_LL_map <- ggplot(data = LL_intl_effort, aes(x = Lon, y = Lat, fill = TotalEffort)) + 
+  geom_tile() + 
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  borders("world2", fill = "#A5AAAF")
+
+Intl_PS_map <- ggplot() + 
+  geom_tile(data = W_PS_intl_effort, aes(x = Lon, y = Lat, fill = TotalEffort)) + 
+  geom_tile(data = E_PS_intl_effort, aes(x = Lon, y = Lat, fill = TotalEffort)) +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  borders("world2", fill = "#A5AAAF")
+
+# Save 
+# png(here("ModelBuild", "FisheryData", "Intl_LL_map.png"), bg = "transparent")
+# Intl_LL_map
+# dev.off()
+
+# # Save 
+# png(here("ModelBuild", "FisheryData", "Intl_PS_map.png"), bg = "transparent")
+# Intl_PS_map
+# dev.off()
+```
+
