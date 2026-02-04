@@ -1,0 +1,537 @@
+---
+title: "Domain_Oceanographic"
+output: html_document
+---
+
+# Purpose
+The purpose of this script is to plot out some different possible 
+oceanographically defined model domain boundaries, together with Hawaiʻi-based
+fishing effort, to see what boundaries best capture our fisheries' effort.
+
+```{r, echo = FALSE, message = FALSE}
+# Set up workspace
+# Set up work space
+library(tidyverse, quietly = TRUE) # for working with data frames
+library(here) # file path management
+library(maps) # for mapping
+library(tidync) # for working with WOA netcdf data
+```
+
+```{r}
+### Load data
+# Thanks to (the now shuttered) phind.com for help with the netCDF stuff, and to
+# Johanna for drawing my attention to the tidync package to begin with
+
+# Create a tidync objects
+# Annual data to start with
+O2_ann_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/oxygen/netcdf/all/1.00/woa23_all_o00_01.nc")
+Temp_ann_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/temperature/netcdf/decav/1.00/woa23_decav_t00_01.nc")
+
+# Extract variables
+# In a tidy-compatible format
+# Handling each side of the dateline independently (annoying)
+O2_ann_t_w <- O2_ann_nc |>
+  activate("o_an") |> # choose the variable we want
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+O2_ann_t_e <- O2_ann_nc |>
+  activate("o_an") |>
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+Temp_ann_t_w <- Temp_ann_nc |>
+  activate("t_an") |> # choose the variable we want
+  hyper_filter(depth = depth == 0) |> #surface only
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+Temp_ann_t_e <- Temp_ann_nc |>
+  activate("t_an") |>
+  hyper_filter(depth = depth == 0) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+# Convert characters to numbers, bummer we can't do this in the sequence above
+O2_ann_t_w <- O2_ann_t_w |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+O2_ann_t_e <- O2_ann_t_e |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+
+Temp_ann_t_w <- Temp_ann_t_w |>
+  mutate_at(c("lon", "lat"), as.numeric)
+Temp_ann_t_e <- Temp_ann_t_e |>
+  mutate_at(c("lon", "lat"), as.numeric)
+
+# Covert to 360-deg longitude
+O2_ann_t_e$lon <- 360 + O2_ann_t_e$lon
+Temp_ann_t_e$lon <- 360 + Temp_ann_t_e$lon
+
+# Combine east with west
+O2_ann_t <- rbind(O2_ann_t_w, O2_ann_t_e)
+Temp_ann_t <- rbind(Temp_ann_t_w, Temp_ann_t_e)
+
+# Clean up
+rm(O2_ann_t_e, O2_ann_t_w, Temp_ann_t_e, Temp_ann_t_w)
+
+# Retaining netCDF dimensions (not used)
+# O2_ann_a_w <- O2_ann_nc |>
+#   activate("o_an") |> # choose the variable we want
+#   hyper_filter(depth = depth <= 1000) |>
+#   hyper_filter(lat = lat >= -25 & lat <= 50) |>
+#   hyper_filter(lon = lon >= 150) |>
+#   hyper_array()
+# O2_ann_a_e <- O2_ann_nc |>
+#   activate("o_an") |>
+#   hyper_filter(depth = depth <= 1000) |>
+#   hyper_filter(lat = lat >= -25 & lat <= 50) |>
+#   hyper_filter(lon = lon <= -110) |>
+#   hyper_array()
+# Temp_ann_a_w <- Temp_ann_nc |>
+#   activate("t_an") |> # choose the variable we want
+#   hyper_filter(depth = depth <= 1000) |>
+#   hyper_filter(lat = lat >= -25 & lat <= 50) |>
+#   hyper_filter(lon = lon >= 150) |>
+#   hyper_array()
+# Temp_ann_a_e <- Temp_ann_nc |>
+#   activate("t_an") |>
+#   hyper_filter(depth = depth <= 1000) |>
+#   hyper_filter(lat = lat >= -25 & lat <= 50) |>
+#   hyper_filter(lon = lon <= -110) |>
+#   hyper_array()
+```
+
+```{r}
+# Let's try quarterly (tedious, but not as tedious as monthly)
+# Create a tidync objects
+O2_Q1_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/oxygen/netcdf/all/1.00/woa23_all_o13_01.nc")
+O2_Q2_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/oxygen/netcdf/all/1.00/woa23_all_o14_01.nc")
+O2_Q3_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/oxygen/netcdf/all/1.00/woa23_all_o15_01.nc")
+O2_Q4_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/oxygen/netcdf/all/1.00/woa23_all_o16_01.nc")
+
+Temp_Q1_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/temperature/netcdf/decav/1.00/woa23_decav_t13_01.nc")
+Temp_Q2_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/temperature/netcdf/decav/1.00/woa23_decav_t14_01.nc")
+Temp_Q3_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/temperature/netcdf/decav/1.00/woa23_decav_t15_01.nc")
+Temp_Q4_nc <- tidync("https://www.ncei.noaa.gov/thredds-ocean/dodsC/woa23/DATA/temperature/netcdf/decav/1.00/woa23_decav_t16_01.nc")
+
+# Extract variables
+# In a tidy-compatible format
+# Handling each side of the dateline independently (annoying)
+O2_Q1_t_w <- O2_Q1_nc |>
+  activate("o_an") |> # choose the variable we want
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+O2_Q1_t_e <- O2_Q1_nc |>
+  activate("o_an") |>
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+O2_Q2_t_w <- O2_Q2_nc |>
+  activate("o_an") |> # choose the variable we want
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+O2_Q2_t_e <- O2_Q2_nc |>
+  activate("o_an") |>
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+O2_Q3_t_w <- O2_Q3_nc |>
+  activate("o_an") |> # choose the variable we want
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+O2_Q3_t_e <- O2_Q3_nc |>
+  activate("o_an") |>
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+O2_Q4_t_w <- O2_Q4_nc |>
+  activate("o_an") |> # choose the variable we want
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+O2_Q4_t_e <- O2_Q4_nc |>
+  activate("o_an") |>
+  hyper_filter(depth = depth <= 1000) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+Temp_Q1_t_w <- Temp_Q1_nc |>
+  activate("t_an") |> # choose the variable we want
+  hyper_filter(depth = depth == 0) |> #surface only
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+Temp_Q1_t_e <- Temp_Q1_nc |>
+  activate("t_an") |>
+  hyper_filter(depth = depth == 0) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+Temp_Q2_t_w <- Temp_Q2_nc |>
+  activate("t_an") |> # choose the variable we want
+  hyper_filter(depth = depth == 0) |> #surface only
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+Temp_Q2_t_e <- Temp_Q2_nc |>
+  activate("t_an") |>
+  hyper_filter(depth = depth == 0) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+Temp_Q3_t_w <- Temp_Q3_nc |>
+  activate("t_an") |> # choose the variable we want
+  hyper_filter(depth = depth == 0) |> #surface only
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+Temp_Q3_t_e <- Temp_Q3_nc |>
+  activate("t_an") |>
+  hyper_filter(depth = depth == 0) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+Temp_Q4_t_w <- Temp_Q4_nc |>
+  activate("t_an") |> # choose the variable we want
+  hyper_filter(depth = depth == 0) |> #surface only
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon >= 150) |>
+  hyper_tibble()
+Temp_Q4_t_e <- Temp_Q4_nc |>
+  activate("t_an") |>
+  hyper_filter(depth = depth == 0) |>
+  hyper_filter(lat = lat >= -25 & lat <= 50) |>
+  hyper_filter(lon = lon <= -110) |>
+  hyper_tibble()
+
+# Convert characters to numbers, bummer we can't do this in the sequence above
+O2_Q1_t_w <- O2_Q1_t_w |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+O2_Q2_t_w <- O2_Q2_t_w |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+O2_Q3_t_w <- O2_Q3_t_w |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+O2_Q4_t_w <- O2_Q4_t_w |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+O2_Q1_t_e <- O2_Q1_t_e |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+O2_Q2_t_e <- O2_Q2_t_e |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+O2_Q3_t_e <- O2_Q3_t_e |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+O2_Q4_t_e <- O2_Q4_t_e |>
+  mutate_at(c("lon", "lat", "depth"), as.numeric)
+
+Temp_Q1_t_w <- Temp_Q1_t_w |>
+  mutate_at(c("lon", "lat"), as.numeric)
+Temp_Q2_t_w <- Temp_Q2_t_w |>
+  mutate_at(c("lon", "lat"), as.numeric)
+Temp_Q3_t_w <- Temp_Q3_t_w |>
+  mutate_at(c("lon", "lat"), as.numeric)
+Temp_Q4_t_w <- Temp_Q4_t_w |>
+  mutate_at(c("lon", "lat"), as.numeric)
+Temp_Q1_t_e <- Temp_Q1_t_e |>
+  mutate_at(c("lon", "lat"), as.numeric)
+Temp_Q2_t_e <- Temp_Q2_t_e |>
+  mutate_at(c("lon", "lat"), as.numeric)
+Temp_Q3_t_e <- Temp_Q3_t_e |>
+  mutate_at(c("lon", "lat"), as.numeric)
+Temp_Q4_t_e <- Temp_Q4_t_e |>
+  mutate_at(c("lon", "lat"), as.numeric)
+
+# Covert to 360-deg longitude
+O2_Q1_t_e$lon <- 360 + O2_Q1_t_e$lon
+O2_Q2_t_e$lon <- 360 + O2_Q2_t_e$lon
+O2_Q3_t_e$lon <- 360 + O2_Q3_t_e$lon
+O2_Q4_t_e$lon <- 360 + O2_Q4_t_e$lon
+Temp_Q1_t_e$lon <- 360 + Temp_Q1_t_e$lon
+Temp_Q2_t_e$lon <- 360 + Temp_Q2_t_e$lon
+Temp_Q3_t_e$lon <- 360 + Temp_Q3_t_e$lon
+Temp_Q4_t_e$lon <- 360 + Temp_Q4_t_e$lon
+
+# Combine east with west
+O2_Q1_t <- rbind(O2_Q1_t_w, O2_Q1_t_e)
+O2_Q2_t <- rbind(O2_Q2_t_w, O2_Q2_t_e)
+O2_Q3_t <- rbind(O2_Q3_t_w, O2_Q3_t_e)
+O2_Q4_t <- rbind(O2_Q4_t_w, O2_Q4_t_e)
+Temp_Q1_t <- rbind(Temp_Q1_t_w, Temp_Q1_t_e)
+Temp_Q2_t <- rbind(Temp_Q2_t_w, Temp_Q2_t_e)
+Temp_Q3_t <- rbind(Temp_Q3_t_w, Temp_Q3_t_e)
+Temp_Q4_t <- rbind(Temp_Q4_t_w, Temp_Q4_t_e)
+
+# Add a column for quarter so that we can combine things
+O2_Q1_t <- O2_Q1_t |>
+  mutate("Quarter" = 1)
+O2_Q2_t <- O2_Q2_t |>
+  mutate("Quarter" = 2)
+O2_Q3_t <- O2_Q3_t |>
+  mutate("Quarter" = 3)
+O2_Q4_t <- O2_Q4_t |>
+  mutate("Quarter" = 4)
+O2_qtr_t <- rbind(O2_Q1_t, O2_Q2_t, O2_Q3_t, O2_Q4_t)
+
+Temp_Q1_t <- Temp_Q1_t |>
+  mutate("Quarter" = 1)
+Temp_Q2_t <- Temp_Q2_t |>
+  mutate("Quarter" = 2)
+Temp_Q3_t <- Temp_Q3_t |>
+  mutate("Quarter" = 3)
+Temp_Q4_t <- Temp_Q4_t |>
+  mutate("Quarter" = 4)
+Temp_qtr_t <- rbind(Temp_Q1_t, Temp_Q2_t, Temp_Q3_t, Temp_Q4_t)
+
+# Clean up
+rm(O2_Q1_t_e, O2_Q2_t_e, O2_Q3_t_e, O2_Q4_t_e,
+   O2_Q1_t_w, O2_Q2_t_w, O2_Q3_t_w, O2_Q4_t_w,
+   O2_Q1_t, O2_Q2_t, O2_Q3_t, O2_Q4_t,
+   Temp_Q1_t_e, Temp_Q2_t_e, Temp_Q3_t_e, Temp_Q4_t_e,
+   Temp_Q1_t_w, Temp_Q2_t_w, Temp_Q3_t_w, Temp_Q4_t_w,
+   Temp_Q1_t, Temp_Q2_t, Temp_Q3_t, Temp_Q4_t)
+```
+
+```{r}
+# Let's create data that can be contoured to show the depth of 1 ml/l and 
+# 2 ml/l oxygen concentrations
+# 1 ml/l = 43.57
+# 2 ml/l = 87.14
+
+O2_ann_2mlpl <- O2_ann_t |>
+  filter(o_an >= 87.14)
+
+O2_ann_1mlpl <- O2_ann_t |>
+  filter(o_an >= 43.57)
+
+O2_qtr_2mlpl <- O2_qtr_t |>
+  filter(o_an >= 87.14)
+
+O2_qtr_1mlpl <- O2_qtr_t |>
+  filter(o_an >= 43.57)
+
+```
+
+```{r}
+# Load fishery data
+ObsSets <- readRDS(here("ModelBuild", "FisheryData", "Obs_Details_HIonly.rds"))
+
+# And wrangle it to get what we want for plotting
+# Add year and month columns, just to make things easier.  
+# And an empty QUARTER column to fill later
+# Remove the experimental trip type column, since it's always NA
+ObsSets <- ObsSets |>
+  mutate(YEAR = year(HAUL_BEGIN_DATETIME),
+         MONTH = month(HAUL_BEGIN_DATETIME),
+         Quarter = NA,
+         EXPR_TRIP_TYPE_ID = NULL)
+
+# Restrict ourselves to 1995 - 2024
+# First year when logbooks noted deep vs. shallow
+# Latest full year
+Obs9524 <- ObsSets |>
+  filter(YEAR >= 1995 & YEAR <= 2024)
+
+# Convert to 360-deg longitude
+neg_lon <- which(Obs9524$HAUL_BEGIN_LON < 0)
+Obs9524$HAUL_BEGIN_LON[neg_lon] <- Obs9524$HAUL_BEGIN_LON[neg_lon] + 360
+
+# Fill Quarter column
+# I'm sure there's a tidy way to do this, but it's escaping me
+Q1 <- which(Obs9524$MONTH < 4)
+Q2 <- which(Obs9524$MONTH > 3 & Obs9524$MONTH < 7)
+Q3 <- which(Obs9524$MONTH > 6 & Obs9524$MONTH < 10)
+Q4 <- which(Obs9524$MONTH > 9)
+Obs9524$Quarter[Q1] <- 1
+Obs9524$Quarter[Q2] <- 2
+Obs9524$Quarter[Q3] <- 3
+Obs9524$Quarter[Q4] <- 4
+
+# Filter to shallow sets only
+Obs9524_Shallow <- Obs9524 |>
+  filter(HKS_PER_FLT < 15)
+
+# Filter to shallow sets only
+Obs9524_Deep <- Obs9524 |>
+  filter(HKS_PER_FLT >= 15)
+```
+
+
+```{r}
+# Create a contour map
+stf_map <- ggplot(data = Temp_ann_t, aes(x = lon, y = lat, z = t_an)) +
+  geom_contour(breaks = c(15)) +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  annotation_borders("world2", fill = "#A5AAAF")
+
+omz_map = ggplot(data = O2_ann_2mlpl, aes(x = lon, y = lat, z = depth)) + 
+  geom_contour(breaks = c(200)) + 
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  annotation_borders("world2", fill = "#A5AAAF")
+
+ocean_domain_map <- ggplot() +
+  geom_point(data = Obs9524_Deep, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#003087") +
+  geom_point(data = Obs9524_Shallow, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#5EB6D9") +
+  geom_contour(data = Temp_ann_t, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "red") +
+  geom_contour(data = O2_ann_2mlpl, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  annotation_borders("world2", fill = "#A5AAAF")
+
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map.png"), bg = "transparent")
+# ocean_domain_map
+# dev.off()
+
+```
+
+```{r}
+# Separate plots for each quarter (not sure why faceting isn't working)
+# Q1
+Obs9524_Deep_Q1 <- Obs9524_Deep |>
+  filter(Quarter == 1)
+Obs9524_Shallow_Q1 <- Obs9524_Shallow |>
+  filter(Quarter == 1)
+Temp_qtr_t_Q1 <- Temp_qtr_t |>
+  filter(Quarter == 1)
+O2_qtr_2mlpl_Q1 <- O2_qtr_2mlpl |>
+  filter(Quarter == 1)
+ocean_domain_map_Q1 <- ggplot() +
+  geom_point(data = Obs9524_Deep_Q1, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#003087") +
+  geom_point(data = Obs9524_Shallow_Q1, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#5EB6D9") +
+  geom_contour(data = Temp_qtr_t_Q1, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "red") +
+  geom_contour(data = O2_qtr_2mlpl_Q1, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) +
+  annotation_borders("world2", fill = "#A5AAAF")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q1.png"), bg = "transparent")
+# ocean_domain_map_Q1
+# dev.off()
+
+# Q2
+Obs9524_Deep_Q2 <- Obs9524_Deep |>
+  filter(Quarter == 2)
+Obs9524_Shallow_Q2 <- Obs9524_Shallow |>
+  filter(Quarter == 2)
+Temp_qtr_t_Q2 <- Temp_qtr_t |>
+  filter(Quarter == 2)
+O2_qtr_2mlpl_Q2 <- O2_qtr_2mlpl |>
+  filter(Quarter == 2)
+ocean_domain_map_Q2 <- ggplot() +
+  geom_point(data = Obs9524_Deep_Q2, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#003087") +
+  geom_point(data = Obs9524_Shallow_Q2, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#5EB6D9") +
+  geom_contour(data = Temp_qtr_t_Q2, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "red") +
+  geom_contour(data = O2_qtr_2mlpl_Q2, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) +
+  annotation_borders("world2", fill = "#A5AAAF")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q2.png"), bg = "transparent")
+# ocean_domain_map_Q2
+# dev.off()
+
+# Q3
+Obs9524_Deep_Q3 <- Obs9524_Deep |>
+  filter(Quarter == 3)
+Obs9524_Shallow_Q3 <- Obs9524_Shallow |>
+  filter(Quarter == 3)
+Temp_qtr_t_Q3 <- Temp_qtr_t |>
+  filter(Quarter == 3)
+O2_qtr_2mlpl_Q3 <- O2_qtr_2mlpl |>
+  filter(Quarter == 3)
+ocean_domain_map_Q3 <- ggplot() +
+  geom_point(data = Obs9524_Deep_Q3, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#003087") +
+  geom_point(data = Obs9524_Shallow_Q3, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#5EB6D9") +
+  geom_contour(data = Temp_qtr_t_Q3, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "red") +
+  geom_contour(data = O2_qtr_2mlpl_Q3, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) +
+  annotation_borders("world2", fill = "#A5AAAF")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q3.png"), bg = "transparent")
+# ocean_domain_map_Q3
+# dev.off()
+
+# Q4
+Obs9524_Deep_Q4 <- Obs9524_Deep |>
+  filter(Quarter == 4)
+Obs9524_Shallow_Q4 <- Obs9524_Shallow |>
+  filter(Quarter == 4)
+Temp_qtr_t_Q4 <- Temp_qtr_t |>
+  filter(Quarter == 4)
+O2_qtr_2mlpl_Q4 <- O2_qtr_2mlpl |>
+  filter(Quarter == 4)
+ocean_domain_map_Q4 <- ggplot() +
+  geom_point(data = Obs9524_Deep_Q4, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#003087") +
+  geom_point(data = Obs9524_Shallow_Q4, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "#5EB6D9") +
+  geom_contour(data = Temp_qtr_t_Q4, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "red") +
+  geom_contour(data = O2_qtr_2mlpl_Q4, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) +
+  annotation_borders("world2", fill = "#A5AAAF")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q4.png"), bg = "transparent")
+# ocean_domain_map_Q4
+# dev.off()
+```
+
+```{r}
+# Combined quarterly maps
+stf_map2 <- ggplot() +
+  geom_contour(data = Temp_ann_t, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "red") +
+  geom_contour(data = Temp_qtr_t_Q1, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "pink1") +
+  geom_contour(data = Temp_qtr_t_Q2, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "pink2") +
+  geom_contour(data = Temp_qtr_t_Q3, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "pink3") +
+  geom_contour(data = Temp_qtr_t_Q4, aes(x = lon, y = lat, z = t_an),
+               breaks = c(15), color = "pink4") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  annotation_borders("world2", fill = "#A5AAAF")
+
+omz_map2 = ggplot() + 
+  geom_contour(data = O2_ann_2mlpl, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple") + 
+  geom_contour(data = O2_qtr_2mlpl_Q1, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "plum1") + 
+  geom_contour(data = O2_qtr_2mlpl_Q2, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "plum2") + 
+  geom_contour(data = O2_qtr_2mlpl_Q3, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "plum3") + 
+  geom_contour(data = O2_qtr_2mlpl_Q4, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "plum4") + 
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  annotation_borders("world2", fill = "#A5AAAF")
+```
+
