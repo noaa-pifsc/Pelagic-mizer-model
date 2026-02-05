@@ -4,7 +4,8 @@ title: "FisheryCharacteristics_maps"
 
 # Purpose
 The purpose of this script is to examine the characteristics of the Hawaii-based
-longline fisheries.  We'll look specifically at:  
+longline fisheries, independently and together with international effort.  We'll 
+look specifically at:  
 
 * fishery footprints  
 * possibly some other stuff
@@ -18,11 +19,32 @@ library(maps) # for mapping
 
 ```{r}
 # Load data
+# Domestic longline
 ObsSets <- readRDS(here("ModelBuild", "FisheryData", "Obs_Details_HIonly.rds"))
+# International longline
+W_LL <- read_csv(here("ModelBuild", "FisheryData", "WCPFC_L_PUBLIC_BY_YY_FLAG",
+                      "WCPFC_L_PUBLIC_BY_YY_FLAG.csv"), show_col_types = FALSE)
+E_LL <- read_csv(here("ModelBuild", "FisheryData", "PublicLLTunaBillfish",
+                     "PublicLLTunaBillfishNum.csv"), show_col_types = FALSE)
 ```
 
 ```{r}
 # Data wrangling to make things easier
+# WCPFC locations are a mix of numbers and letters (annoying)
+# Strip out the letters and turn the numbers into positive and negative integers
+north <- str_detect(W_LL$LAT5, "N")
+W_LL$LAT5[north] <- str_sub(W_LL$LAT5[north], end = -2)
+south <- str_detect(W_LL$LAT5, "S")
+W_LL$LAT5[south] <- str_sub(W_LL$LAT5[south], end = -2)
+east <- str_detect(W_LL$LON5, "E")
+W_LL$LON5[east] <- str_sub(W_LL$LON5[east], end = -2)
+west <- str_detect(W_LL$LON5, "W")
+W_LL$LON5[west] <- str_sub(W_LL$LON5[west], end = -2)
+W_LL <- W_LL |>
+  mutate_at(c('LAT5', 'LON5'), as.numeric)
+W_LL$LAT5[south] <- W_LL$LAT5[south] * -1
+W_LL$LON5[west] <- 360 - W_LL$LON5[west]
+rm(north, south, east, west)
 
 # Add a year column, just to make things easier.  
 # Remove the experimental trip type column, since it's always NA
@@ -39,6 +61,47 @@ Obs9524 <- ObsSets |>
 # Convert to 360-deg longitude
 neg_lon <- which(Obs9524$HAUL_BEGIN_LON < 0)
 Obs9524$HAUL_BEGIN_LON[neg_lon] <- Obs9524$HAUL_BEGIN_LON[neg_lon] + 360
+E_LL$LonC5 <- E_LL$LonC5 + 360
+
+# Filter out US longline effort, because we can account for that more finely
+# with logbook data
+# Filter to >= 1995 for consistency with HI data (max year is 2024)
+W_LL_intl <- W_LL |>
+  filter(flag_code != "US") |>
+  filter(YY >= 1995)
+
+E_LL_intl <- E_LL |>
+  filter(Flag != "USA") |>
+  filter(Year >= 1995)
+
+# Group by grid point and sum across years
+W_LL_intl_effort <- W_LL_intl |>
+  select(LAT5, LON5, HHOOKS) |>
+  group_by(LAT5, LON5) |>
+  summarise(TotalEffort = sum(HHOOKS))
+
+E_LL_intl_effort <- E_LL_intl |>
+  select(LatC5, LonC5, Hooks) |>
+  group_by(LatC5, LonC5) |>
+  summarise(TotalEffort = sum(Hooks))
+
+# Harmonize units across convention areas, WCPFC is hundreds of hooks
+# Harmonize grid across convention areas, WCPFC is SW corner, IATTC is center
+W_LL_intl_effort$TotalEffort <- W_LL_intl_effort$TotalEffort * 100
+W_LL_intl_effort$LAT5 <- W_LL_intl_effort$LAT5 + 2.5
+W_LL_intl_effort$LON5 <- W_LL_intl_effort$LON5 + 2.5
+
+# Rename columns to common names
+W_LL_intl_effort <- W_LL_intl_effort |>
+  rename(Lat = LAT5, Lon = LON5)
+E_LL_intl_effort <- E_LL_intl_effort |>
+  rename(Lat = LatC5, Lon = LonC5)
+
+# Combine for mapping
+LL_intl_effort <- rbind(W_LL_intl_effort, E_LL_intl_effort)
+LL_intl_effort <- LL_intl_effort |>
+  group_by(Lat, Lon) |>
+  summarise(TotalEffort = sum(TotalEffort))
 ```
 
 ```{r}
@@ -53,12 +116,12 @@ shallow_map <- ggplot() +
   geom_point(data = Obs9524_Shallow, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#5EB6D9") +
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
-  borders("world2", fill = "#A5AAAF") 
+  annotation_borders("world2", fill = "#A5AAAF") 
 
 # Save 
-png(here("ModelBuild", "FisheryData", "ShallowSetMap.png"), bg = "transparent")
-shallow_map
-dev.off()
+# png(here("ModelBuild", "FisheryData", "ShallowSetMap.png"), bg = "transparent")
+# shallow_map
+# dev.off()
 ```
 
 ```{r}
@@ -73,12 +136,12 @@ deep_map <- ggplot() +
   geom_point(data = Obs9524_Deep, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#003087") +
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
-  borders("world2", fill = "#A5AAAF") 
+  annotation_borders("world2", fill = "#A5AAAF") 
 
 # Save 
-png(here("ModelBuild", "FisheryData", "DeepSetMap.png"), bg = "transparent")
-deep_map
-dev.off()
+# png(here("ModelBuild", "FisheryData", "DeepSetMap.png"), bg = "transparent")
+# deep_map
+# dev.off()
 ```
 
 ```{r}
@@ -90,11 +153,24 @@ combined_map <- ggplot() +
   geom_point(data = Obs9524_Shallow, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#5EB6D9") +
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
-  borders("world2", fill = "#A5AAAF")
+  annotation_borders("world2", fill = "#A5AAAF")
 
 # Save 
-png(here("ModelBuild", "FisheryData", "CombinedMap.png"), bg = "transparent")
-combined_map
-dev.off()
+# png(here("ModelBuild", "FisheryData", "CombinedMap.png"), bg = "transparent")
+# combined_map
+# dev.off()
+
+combined_Intl_LL_map <- ggplot() + 
+  geom_tile(data = LL_intl_effort, aes(x = Lon, y = Lat, fill = TotalEffort)) +
+  geom_point(data = Obs9524_Deep, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "purple") +
+  geom_point(data = Obs9524_Shallow, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+             shape = 21, color = "plum") +
+  coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
+  annotation_borders("world2", fill = "#A5AAAF")
+# Save 
+# png(here("ModelBuild", "FisheryData", "CombinedIntlLLMap.png"), bg = "transparent")
+# combined_Intl_LL_map
+# dev.off()
 ```
 
