@@ -1,0 +1,199 @@
+---
+title: "BarnesDietData"
+output: html_document
+---
+
+# Purpose
+
+The purpose of this script is to work with the data from Barnes et al. (2008) to
+estimate *beta* and *sigma* for species used in our model where other references
+aren't available. 
+
+```{r}
+# Set up environment
+library(tidyverse) # for working with data
+library(here) # OS-agnostic file path management
+```
+
+```{r}
+# Load data
+# This follows the file structure of the zipped files one gets when downloading
+# the Barnes data (3529112/.../...)
+# The file has tab-separated values (hence read_tsv)
+# Loading the data produces a warning about an NA value in row 28292 col 12
+Barnes <- read_tsv(here("ModelBuild", "DietData", "3529112", "ECOL_89_51", 
+                        "Predator_and_prey_body_sizes_in_marine_food_webs_vsn4.txt"),
+                   show_col_types = FALSE)
+
+```
+
+```{r}
+# Explore data
+
+# What types of predators are there?
+unique(Barnes$`Predator  taxon`)
+
+# And where do the data come from?
+unique(Barnes$`Geographic location`)
+
+# Let's restrict ourselves to "ectotherm vertebrates" 
+BarnesEV <- Barnes |>
+  filter(`Predator  taxon` == "ectotherm vertebrate")
+# This omits "cephalopod" records
+
+# And we can omit some geographic regions right off the top
+BarnesEV_notHighLat <- BarnesEV |>
+  filter(`Geographic location` != "Gulf of Alaska" &
+         `Geographic location` != "NE North Sea and Skaggerak" &
+         `Geographic location` != "W Greenland" &
+          `Geographic location` != "Strait of Georgia" &
+          `Geographic location` != "Antarctic Peninsula" &
+          `Geographic location` != "Greenland")
+# This retains the following regions:
+# "Apalachicola Bay, Florida", "Crooked Island Sound, Florida",
+# "Jeffreys Ledge, Gulf of Maine, New England", "Stellwagen Bank, Gulf of Maine, New England",
+# "Cape Cod Bay, Gulf of Maine, New England", "Great Channel South, Gulf of Maine, New England",
+# "South of Marthas Vineyard, New England", "Gulf of Maine, New England",
+# "Andaman Sea (West of South Thailand)", "French Polynesian EEZ", "Catalan Sea",
+# "Western North Pacific", "Atlantic Ocean", "Off the Bay of Biscay",
+# "Great South Bay, Long Island, New York", "Europe, Celtic Sea ecosystem",                  
+# "Oxwich Bay, Wales", "Eastern Mediterranean"  
+
+# And we can eliminate some specific habitat types
+BarnesEV_noHighLat_PelagicPlus <- BarnesEV_notHighLat |>
+  filter(`Specific habitat` != "demersal food web" &
+         `Specific habitat` != "estuary/coastal")
+# This retains the following habitats
+# "Coastal Bay", "Shelf", "inshore", "open ocean", "shelfbreak/open ocean",
+# "transition region", "Pelagic", "Off the continental shelf", "Coastal bay",
+# "Euboikos and Pagassitikos Gulfs"
+
+# Finally, we can group the remaining species into a few common groups and species
+Barnes_final_sharks <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Atlantic sharpnose shark" |
+         `Predator common name` == "Blacktip shark" | 
+         `Predator common name` == "Finetooth shark" |
+         `Predator common name` == "Spinner shark" |
+         `Predator common name` == "Spurdog / spiny dogfish" |
+         `Predator common name` == "Smooth dogfish")
+  
+Barnes_final_rays <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Atlantic torpedo ray" |
+         `Predator common name` == "Winter skate" | 
+         `Predator common name` == "Little skate")
+
+Barnes_final_bye <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Bigeye tuna")
+
+Barnes_final_swd <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Swordfish")
+
+Barnes_final_yft <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Yellowfin tuna")
+
+Barnes_final_alb <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Albacore")
+
+Barnes_final_umnk <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Myctophidae fish larva" |
+         `Predator common name` == "Paralepididae fish larva")
+
+# And make a general "fish" group (teleosts)
+# First pulling in fish we haven't used yet
+# Using all fish that aren't demersal or associated with a non-pelagic habitat
+Barnes_final_fish <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Atlantic bluefin tuna" |
+         `Predator common name` == "Jack / Pompano" |
+         `Predator common name` == "Spotted hake" | 
+         `Predator common name` == "Silver hake" |
+         `Predator common name` == "Red hake" |
+         `Predator common name` == "White hake" |
+         `Predator common name` == "Weakfish" |
+         `Predator common name` == "Bluefish" |
+         `Predator common name` == "Atlantic cod" |
+         `Predator common name` == "Saithe" |
+         `Predator common name` == "John dory")
+
+# Then, adding in the fish groups we've already created.
+Barnes_final_fish <- rbind(Barnes_final_fish, 
+                           Barnes_final_bye,
+                           Barnes_final_swd,
+                           Barnes_final_yft,
+                           Barnes_final_alb,
+                           Barnes_final_umnk)
+
+# We're omitting these species:
+# "Surgeon / tang / unicorn": reef-associated
+# "Scorpion / rockfish", "Longhorn sculpin", "Sea raven", "Tonguefish": demersal
+# "Fourspot flounder", "Summer flounder", "Windowpane", "Goosefish": demersal
+```
+```{r}
+# Bigeye tuna
+unique(Barnes_final_bye$`Predator measurement type`) # all individuals
+unique(Barnes_final_bye$`Predator mass unit`) # all g
+unique(Barnes_final_bye$`Prey measurement type`) # all individuals
+unique(Barnes_final_bye$`Prey mass unit`) # all g
+
+plot(log10(Barnes_final_bye$`Prey mass`), log10(Barnes_final_bye$`Predator mass`))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Barnes_final_bye$`Predator mass`/Barnes_final_bye$`Prey mass`)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+bye_PPMR <- Barnes_final_bye$`Predator mass`/Barnes_final_bye$`Prey mass`
+bye_PPMR_quartiles <- quantile(bye_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1))
+bye_PPMR_quartiles_log10 <- quantile(log10(bye_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1))
+
+bye_beta <- bye_PPMR_quartiles[[3]]
+bye_sigma <- bye_PPMR_quartiles_log10[[4]] - bye_PPMR_quartiles_log10[[2]]
+```
+
+```{r}
+# Swordfish
+unique(Barnes_final_swd$`Predator measurement type`) # all individuals
+unique(Barnes_final_swd$`Predator mass unit`) # all g
+unique(Barnes_final_swd$`Prey measurement type`) # all individuals
+unique(Barnes_final_swd$`Prey mass unit`) # all g
+
+plot(log10(Barnes_final_swd$`Prey mass`), log10(Barnes_final_swd$`Predator mass`))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Barnes_final_swd$`Predator mass`/Barnes_final_swd$`Prey mass`)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+swd_PPMR <- Barnes_final_swd$`Predator mass`/Barnes_final_swd$`Prey mass`
+swd_PPMR_quartiles <- quantile(swd_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1))
+swd_PPMR_quartiles_log10 <- quantile(log10(swd_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1))
+
+swd_beta <- swd_PPMR_quartiles[[3]]
+swd_sigma <- swd_PPMR_quartiles_log10[[4]] - swd_PPMR_quartiles_log10[[2]]
+```
+```{r}
+# Yellowfin tuna
+unique(Barnes_final_yft$`Predator measurement type`) # all individuals
+unique(Barnes_final_yft$`Predator mass unit`) # all g
+unique(Barnes_final_yft$`Prey measurement type`) # all individuals
+unique(Barnes_final_yft$`Prey mass unit`) # all g
+
+plot(log10(Barnes_final_yft$`Prey mass`), log10(Barnes_final_yft$`Predator mass`))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Barnes_final_yft$`Predator mass`/Barnes_final_yft$`Prey mass`)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+yft_PPMR <- Barnes_final_yft$`Predator mass`/Barnes_final_yft$`Prey mass`
+yft_PPMR_quartiles <- quantile(yft_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1))
+yft_PPMR_quartiles_log10 <- quantile(log10(yft_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1))
+
+yft_beta <- yft_PPMR_quartiles[[3]]
+yft_sigma <- yft_PPMR_quartiles_log10[[4]] - yft_PPMR_quartiles_log10[[2]]
+```
