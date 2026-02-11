@@ -197,3 +197,128 @@ yft_PPMR_quartiles_log10 <- quantile(log10(yft_PPMR), probs = c(0, 0.05, 0.5, 0.
 yft_beta <- yft_PPMR_quartiles[[3]]
 yft_sigma <- yft_PPMR_quartiles_log10[[4]] - yft_PPMR_quartiles_log10[[2]]
 ```
+
+```{r}
+# Albacore tuna
+unique(Barnes_final_alb$`Predator measurement type`) # all individuals
+unique(Barnes_final_alb$`Predator mass unit`) # all g
+unique(Barnes_final_alb$`Prey measurement type`) # all individuals
+unique(Barnes_final_alb$`Prey mass unit`) # all g
+
+plot(log10(Barnes_final_alb$`Prey mass`), log10(Barnes_final_alb$`Predator mass`))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Barnes_final_alb$`Predator mass`/Barnes_final_alb$`Prey mass`)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+alb_PPMR <- Barnes_final_alb$`Predator mass`/Barnes_final_alb$`Prey mass`
+alb_PPMR_quartiles <- quantile(alb_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1))
+alb_PPMR_quartiles_log10 <- quantile(log10(alb_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1))
+
+alb_beta <- alb_PPMR_quartiles[[3]]
+alb_sigma <- alb_PPMR_quartiles_log10[[4]] - alb_PPMR_quartiles_log10[[2]]
+```
+
+```{r}
+# Micronekton
+unique(Barnes_final_umnk$`Predator measurement type`) # all individuals
+unique(Barnes_final_umnk$`Predator mass unit`) # all g
+unique(Barnes_final_umnk$`Prey measurement type`) # all individuals
+unique(Barnes_final_umnk$`Prey mass unit`) # all g
+
+plot(log10(Barnes_final_umnk$`Prey mass`), log10(Barnes_final_umnk$`Predator mass`))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Barnes_final_umnk$`Predator mass`/Barnes_final_umnk$`Prey mass`)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+umnk_PPMR <- Barnes_final_umnk$`Predator mass`/Barnes_final_umnk$`Prey mass`
+umnk_PPMR_quartiles <- quantile(umnk_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1))
+umnk_PPMR_quartiles_log10 <- quantile(log10(umnk_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1))
+
+umnk_beta <- umnk_PPMR_quartiles[[3]]
+umnk_sigma <- umnk_PPMR_quartiles_log10[[4]] - umnk_PPMR_quartiles_log10[[2]]
+```
+
+```{r}
+# Generic fish
+unique(Barnes_final_fish$`Predator measurement type`) 
+Barnes_final_fish_indv <- Barnes_final_fish |>
+  filter(`Predator measurement type` == "individual") # omits "mid-class"
+
+unique(Barnes_final_fish_indv$`Predator mass unit`) # all g
+unique(Barnes_final_fish_indv$`Prey measurement type`) 
+Barnes_final_fish_indv2 <- Barnes_final_fish_indv |>
+  filter(`Prey measurement type` == "individual") # omits "preferred" 
+unique(Barnes_final_fish_indv2$`Prey mass unit`) # all g
+
+plot(log10(Barnes_final_fish_indv2$`Prey mass`), log10(Barnes_final_fish_indv2$`Predator mass`))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Barnes_final_fish_indv2$`Predator mass`/Barnes_final_fish_indv2$`Prey mass`)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+fish_PPMR <- Barnes_final_fish_indv2$`Predator mass`/Barnes_final_fish_indv2$`Prey mass`
+fish_PPMR_quartiles <- quantile(fish_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1))
+fish_PPMR_quartiles_log10 <- quantile(log10(fish_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1))
+
+fish_beta <- fish_PPMR_quartiles[[3]]
+fish_sigma <- fish_PPMR_quartiles_log10[[4]] - fish_PPMR_quartiles_log10[[2]]
+```
+
+```{r}
+# Sharks
+unique(Barnes_final_sharks$`Predator measurement type`) # all individuals
+unique(Barnes_final_sharks$`Predator mass unit`) # all g
+unique(Barnes_final_sharks$`Prey measurement type`) # all individuals
+unique(Barnes_final_sharks$`Prey mass unit`) # all g
+
+plot(log10(Barnes_final_sharks$`Prey mass`), log10(Barnes_final_sharks$`Predator mass`))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Barnes_final_sharks$`Predator mass`/Barnes_final_sharks$`Prey mass`)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+sharks_PPMR <- Barnes_final_sharks$`Predator mass`/Barnes_final_sharks$`Prey mass`
+sharks_PPMR_quartiles <- quantile(sharks_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1))
+sharks_PPMR_quartiles_log10 <- quantile(log10(sharks_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1))
+
+sharks_beta <- sharks_PPMR_quartiles[[3]]
+sharks_sigma <- sharks_PPMR_quartiles_log10[[4]] - sharks_PPMR_quartiles_log10[[2]]
+```
+
+```{r}
+# Rays
+unique(Barnes_final_rays$`Predator measurement type`) # all individuals
+unique(Barnes_final_rays$`Predator mass unit`) # all g
+unique(Barnes_final_rays$`Prey measurement type`) # all individuals
+unique(Barnes_final_rays$`Prey mass unit`) # all g
+
+plot(log10(Barnes_final_rays$`Prey mass`), log10(Barnes_final_rays$`Predator mass`))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Barnes_final_rays$`Predator mass`/Barnes_final_rays$`Prey mass`)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+rays_PPMR <- Barnes_final_rays$`Predator mass`/Barnes_final_rays$`Prey mass`
+rays_PPMR_quartiles <- quantile(rays_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1))
+rays_PPMR_quartiles_log10 <- quantile(log10(rays_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1))
+
+rays_beta <- rays_PPMR_quartiles[[3]]
+rays_sigma <- rays_PPMR_quartiles_log10[[4]] - rays_PPMR_quartiles_log10[[2]]
+```
