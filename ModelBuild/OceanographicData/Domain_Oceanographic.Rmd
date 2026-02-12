@@ -315,6 +315,7 @@ rm(O2_Q1_t_e, O2_Q2_t_e, O2_Q3_t_e, O2_Q4_t_e,
 # 2 ml/l oxygen concentrations
 # 1 ml/l = 43.57
 # 2 ml/l = 87.14
+# 2.1 ml/l = 91.497 # Threshold from Howell et al. 2010
 
 O2_ann_2mlpl <- O2_ann_t |>
   filter(o_an >= 87.14)
@@ -322,11 +323,17 @@ O2_ann_2mlpl <- O2_ann_t |>
 O2_ann_1mlpl <- O2_ann_t |>
   filter(o_an >= 43.57)
 
+O2_ann_21mlpl <- O2_ann_t |>
+  filter(o_an >= 91.497)
+
 O2_qtr_2mlpl <- O2_qtr_t |>
   filter(o_an >= 87.14)
 
 O2_qtr_1mlpl <- O2_qtr_t |>
   filter(o_an >= 43.57)
+
+O2_qtr_21mlpl <- O2_qtr_t |>
+  filter(o_an >= 91.497)
 
 ```
 
@@ -396,10 +403,12 @@ ocean_domain_map <- ggplot() +
                breaks = c(15), color = "red") +
   geom_contour(data = O2_ann_2mlpl, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "purple") +
+  geom_contour(data = O2_ann_21mlpl, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple4") +
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
   annotation_borders("world2", fill = "#A5AAAF")
 
-# png(here("ModelBuild", "OceanographicData", "ocean_domain_map.png"), bg = "transparent")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_w2p1.png"), bg = "transparent")
 # ocean_domain_map
 # dev.off()
 
@@ -414,6 +423,8 @@ Obs9524_Shallow_Q1 <- Obs9524_Shallow |>
   filter(Quarter == 1)
 Temp_qtr_t_Q1 <- Temp_qtr_t |>
   filter(Quarter == 1)
+O2_qtr_21mlpl_Q1 <- O2_qtr_21mlpl |>
+  filter(Quarter == 1)
 O2_qtr_2mlpl_Q1 <- O2_qtr_2mlpl |>
   filter(Quarter == 1)
 ocean_domain_map_Q1 <- ggplot() +
@@ -425,9 +436,11 @@ ocean_domain_map_Q1 <- ggplot() +
                breaks = c(15), color = "red") +
   geom_contour(data = O2_qtr_2mlpl_Q1, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "purple") +
+  geom_contour(data = O2_qtr_21mlpl_Q1, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple4") +
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) +
   annotation_borders("world2", fill = "#A5AAAF")
-# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q1.png"), bg = "transparent")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q1_w2p1.png"), bg = "transparent")
 # ocean_domain_map_Q1
 # dev.off()
 
@@ -437,6 +450,8 @@ Obs9524_Deep_Q2 <- Obs9524_Deep |>
 Obs9524_Shallow_Q2 <- Obs9524_Shallow |>
   filter(Quarter == 2)
 Temp_qtr_t_Q2 <- Temp_qtr_t |>
+  filter(Quarter == 2)
+O2_qtr_21mlpl_Q2 <- O2_qtr_21mlpl |>
   filter(Quarter == 2)
 O2_qtr_2mlpl_Q2 <- O2_qtr_2mlpl |>
   filter(Quarter == 2)
@@ -449,9 +464,11 @@ ocean_domain_map_Q2 <- ggplot() +
                breaks = c(15), color = "red") +
   geom_contour(data = O2_qtr_2mlpl_Q2, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "purple") +
+  geom_contour(data = O2_qtr_21mlpl_Q2, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple4") +
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) +
   annotation_borders("world2", fill = "#A5AAAF")
-# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q2.png"), bg = "transparent")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q2_w2p1.png"), bg = "transparent")
 # ocean_domain_map_Q2
 # dev.off()
 
@@ -461,6 +478,8 @@ Obs9524_Deep_Q3 <- Obs9524_Deep |>
 Obs9524_Shallow_Q3 <- Obs9524_Shallow |>
   filter(Quarter == 3)
 Temp_qtr_t_Q3 <- Temp_qtr_t |>
+  filter(Quarter == 3)
+O2_qtr_21mlpl_Q3 <- O2_qtr_21mlpl |>
   filter(Quarter == 3)
 O2_qtr_2mlpl_Q3 <- O2_qtr_2mlpl |>
   filter(Quarter == 3)
@@ -473,9 +492,11 @@ ocean_domain_map_Q3 <- ggplot() +
                breaks = c(15), color = "red") +
   geom_contour(data = O2_qtr_2mlpl_Q3, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "purple") +
+  geom_contour(data = O2_qtr_21mlpl_Q3, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple4") +
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) +
   annotation_borders("world2", fill = "#A5AAAF")
-# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q3.png"), bg = "transparent")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q3_w2p1.png"), bg = "transparent")
 # ocean_domain_map_Q3
 # dev.off()
 
@@ -485,6 +506,8 @@ Obs9524_Deep_Q4 <- Obs9524_Deep |>
 Obs9524_Shallow_Q4 <- Obs9524_Shallow |>
   filter(Quarter == 4)
 Temp_qtr_t_Q4 <- Temp_qtr_t |>
+  filter(Quarter == 4)
+O2_qtr_21mlpl_Q4 <- O2_qtr_21mlpl |>
   filter(Quarter == 4)
 O2_qtr_2mlpl_Q4 <- O2_qtr_2mlpl |>
   filter(Quarter == 4)
@@ -497,9 +520,11 @@ ocean_domain_map_Q4 <- ggplot() +
                breaks = c(15), color = "red") +
   geom_contour(data = O2_qtr_2mlpl_Q4, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "purple") +
+  geom_contour(data = O2_qtr_21mlpl_Q4, aes(x = lon, y = lat, z = depth),
+               breaks = c(200), color = "purple4") +
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) +
   annotation_borders("world2", fill = "#A5AAAF")
-# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q4.png"), bg = "transparent")
+# png(here("ModelBuild", "OceanographicData", "ocean_domain_map_Q4_w2p1.png"), bg = "transparent")
 # ocean_domain_map_Q4
 # dev.off()
 ```
@@ -521,15 +546,15 @@ stf_map2 <- ggplot() +
   annotation_borders("world2", fill = "#A5AAAF")
 
 omz_map2 = ggplot() + 
-  geom_contour(data = O2_ann_2mlpl, aes(x = lon, y = lat, z = depth),
+  geom_contour(data = O2_ann_21mlpl, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "purple") + 
-  geom_contour(data = O2_qtr_2mlpl_Q1, aes(x = lon, y = lat, z = depth),
+  geom_contour(data = O2_qtr_21mlpl_Q1, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "plum1") + 
-  geom_contour(data = O2_qtr_2mlpl_Q2, aes(x = lon, y = lat, z = depth),
+  geom_contour(data = O2_qtr_21mlpl_Q2, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "plum2") + 
-  geom_contour(data = O2_qtr_2mlpl_Q3, aes(x = lon, y = lat, z = depth),
+  geom_contour(data = O2_qtr_21mlpl_Q3, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "plum3") + 
-  geom_contour(data = O2_qtr_2mlpl_Q4, aes(x = lon, y = lat, z = depth),
+  geom_contour(data = O2_qtr_21mlpl_Q4, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "plum4") + 
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
   annotation_borders("world2", fill = "#A5AAAF")
