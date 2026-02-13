@@ -1,0 +1,108 @@
+---
+title: "AlbacoreDietData"
+output: html_document
+---
+
+# Purpose
+
+The purpose of this script is to work with the data from Barnes et al. (2008) 
+and Goñi (2014) to estimate *beta* and *sigma* for albacore tuna to be used in 
+our model. 
+
+```{r}
+# Set up environment
+library(tidyverse) # for working with data
+library(here) # OS-agnostic file path management
+```
+
+```{r}
+# Load Barnes data
+# This follows the file structure of the zipped files one gets when downloading
+# the Barnes data (3529112/.../...)
+# The file has tab-separated values (hence read_tsv)
+# Loading the data produces a warning about an NA value in row 28292 col 12
+Barnes <- read_tsv(here("ModelBuild", "DietData", "3529112", "ECOL_89_51", 
+                        "Predator_and_prey_body_sizes_in_marine_food_webs_vsn4.txt"),
+                   show_col_types = FALSE)
+
+```
+
+```{r}
+# Wrangle Barnes data in the same was as we do for other species/groups
+# Let's restrict ourselves to "ectotherm vertebrates" 
+BarnesEV <- Barnes |>
+  filter(`Predator  taxon` == "ectotherm vertebrate")
+# This omits "cephalopod" records
+
+# And we can omit some geographic regions right off the top
+BarnesEV_notHighLat <- BarnesEV |>
+  filter(`Geographic location` != "Gulf of Alaska" &
+         `Geographic location` != "NE North Sea and Skaggerak" &
+         `Geographic location` != "W Greenland" &
+          `Geographic location` != "Strait of Georgia" &
+          `Geographic location` != "Antarctic Peninsula" &
+          `Geographic location` != "Greenland")
+# This retains the following regions:
+# "Apalachicola Bay, Florida", "Crooked Island Sound, Florida",
+# "Jeffreys Ledge, Gulf of Maine, New England", "Stellwagen Bank, Gulf of Maine, New England",
+# "Cape Cod Bay, Gulf of Maine, New England", "Great Channel South, Gulf of Maine, New England",
+# "South of Marthas Vineyard, New England", "Gulf of Maine, New England",
+# "Andaman Sea (West of South Thailand)", "French Polynesian EEZ", "Catalan Sea",
+# "Western North Pacific", "Atlantic Ocean", "Off the Bay of Biscay",
+# "Great South Bay, Long Island, New York", "Europe, Celtic Sea ecosystem",                  
+# "Oxwich Bay, Wales", "Eastern Mediterranean"  
+
+# And we can eliminate some specific habitat types
+BarnesEV_noHighLat_PelagicPlus <- BarnesEV_notHighLat |>
+  filter(`Specific habitat` != "demersal food web" &
+         `Specific habitat` != "estuary/coastal")
+# This retains the following habitats
+# "Coastal Bay", "Shelf", "inshore", "open ocean", "shelfbreak/open ocean",
+# "transition region", "Pelagic", "Off the continental shelf", "Coastal bay",
+# "Euboikos and Pagassitikos Gulfs"
+
+# Group just the albacore tuna
+Barnes_final_alb <- BarnesEV_noHighLat_PelagicPlus |>
+  filter(`Predator common name` == "Albacore")
+```
+
+```{r}
+# Load the Goñi data
+# We're omitting the metadata section at the top of the file 
+Goni <- read_tsv(here("ModelBuild", "DietData", 
+                      "stomach_Albacore_bluefin_tune_BayofBiscay_2004-2011.tab"),
+                 skip = 369, show_col_types = FALSE)
+
+# Filter to just albacore tuna
+# There are a lot of zeros for the prey weight, filter those out
+Goni_alb <- Goni |>
+  filter(`Pred t` == "Thunnus alalunga") |>
+  filter(`Prey m [g]` > 0)
+```
+
+```{r}
+# Barnes and Goñi both use the same units (g)
+# Let's make a combined predator group and a combined prey group
+Preds <- c(Barnes_final_alb$`Predator mass`, Goni_alb$`Pred m [g] (wet weight)`)
+Preys <- c(Barnes_final_alb$`Prey mass`, Goni_alb$`Prey m [g]`)
+```
+
+```{r}
+# Treat them the same way as other species (BarnesDietData.Rmd)
+plot(log10(Preys), log10(Preds))
+
+# We want the linear predator-prey mass ratio (PPMR).  This is beta.
+plot(Preds/Preys)
+
+# There are some outliers in the PPMR that it seems reasonable to remove.
+# We'll use the median as the beta and 
+# we'll take the distance across the middle 90% of the log10-transformed PPMR
+# as sigma
+alb_PPMR <- Preds/Preys
+alb_PPMR_quartiles <- quantile(alb_PPMR, probs = c(0, 0.05, 0.5, 0.95, 1), na.rm = TRUE)
+alb_PPMR_quartiles_log10 <- quantile(log10(alb_PPMR), probs = c(0, 0.05, 0.5, 0.95, 1), na.rm = TRUE)
+
+alb_beta <- alb_PPMR_quartiles[[3]]
+alb_sigma <- alb_PPMR_quartiles_log10[[4]] - alb_PPMR_quartiles_log10[[2]]
+```
+
