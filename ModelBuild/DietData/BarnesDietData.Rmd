@@ -149,6 +149,12 @@ bye_PPMR_quartiles_log10 <- quantile(log10(bye_PPMR), probs = c(0, 0.05, 0.5, 0.
 
 bye_beta <- bye_PPMR_quartiles[[3]]
 bye_sigma <- bye_PPMR_quartiles_log10[[4]] - bye_PPMR_quartiles_log10[[2]]
+
+# Plot
+hist(log10(bye_PPMR), freq = FALSE)
+lines(density(log10(bye_PPMR)))
+abline(v = log10(bye_beta), col = "darkgreen", lwd = 2)
+lines(x = c(bye_PPMR_quartiles_log10[[2]], bye_PPMR_quartiles_log10[[4]]), y = c(0.25, 0.25), col = "darkgreen", lwd = 2)
 ```
 
 ```{r}
@@ -173,6 +179,11 @@ swd_PPMR_quartiles_log10 <- quantile(log10(swd_PPMR), probs = c(0, 0.05, 0.5, 0.
 
 swd_beta <- swd_PPMR_quartiles[[3]]
 swd_sigma <- swd_PPMR_quartiles_log10[[4]] - swd_PPMR_quartiles_log10[[2]]
+
+hist(log10(swd_PPMR), freq = FALSE)
+lines(density(log10(swd_PPMR)))
+abline(v = log10(swd_beta), col = "darkgreen", lwd = 2)
+lines(x = c(swd_PPMR_quartiles_log10[[2]], swd_PPMR_quartiles_log10[[4]]), y = c(0.25, 0.25), col = "darkgreen", lwd = 2)
 ```
 ```{r}
 # Yellowfin tuna
@@ -196,6 +207,11 @@ yft_PPMR_quartiles_log10 <- quantile(log10(yft_PPMR), probs = c(0, 0.05, 0.5, 0.
 
 yft_beta <- yft_PPMR_quartiles[[3]]
 yft_sigma <- yft_PPMR_quartiles_log10[[4]] - yft_PPMR_quartiles_log10[[2]]
+
+hist(log10(yft_PPMR), freq = FALSE)
+lines(density(log10(yft_PPMR)))
+abline(v = log10(yft_beta), col = "darkgreen", lwd = 2)
+lines(x = c(yft_PPMR_quartiles_log10[[2]], yft_PPMR_quartiles_log10[[4]]), y = c(0.25, 0.25), col = "darkgreen", lwd = 2)
 ```
 
 ```{r}
@@ -220,6 +236,11 @@ alb_PPMR_quartiles_log10 <- quantile(log10(alb_PPMR), probs = c(0, 0.05, 0.5, 0.
 
 alb_beta <- alb_PPMR_quartiles[[3]]
 alb_sigma <- alb_PPMR_quartiles_log10[[4]] - alb_PPMR_quartiles_log10[[2]]
+
+hist(log10(alb_PPMR), freq = FALSE)
+lines(density(log10(alb_PPMR)))
+abline(v = log10(alb_beta), col = "darkgreen", lwd = 2)
+lines(x = c(alb_PPMR_quartiles_log10[[2]], alb_PPMR_quartiles_log10[[4]]), y = c(0.25, 0.25), col = "darkgreen", lwd = 2)
 ```
 
 ```{r}
@@ -273,6 +294,11 @@ fish_PPMR_quartiles_log10 <- quantile(log10(fish_PPMR), probs = c(0, 0.05, 0.5, 
 
 fish_beta <- fish_PPMR_quartiles[[3]]
 fish_sigma <- fish_PPMR_quartiles_log10[[4]] - fish_PPMR_quartiles_log10[[2]]
+
+hist(log10(fish_PPMR), freq = FALSE)
+lines(density(log10(fish_PPMR)))
+abline(v = log10(fish_beta), col = "darkgreen", lwd = 2)
+lines(x = c(fish_PPMR_quartiles_log10[[2]], fish_PPMR_quartiles_log10[[4]]), y = c(0.25, 0.25), col = "darkgreen", lwd = 2)
 ```
 
 ```{r}
@@ -297,6 +323,11 @@ sharks_PPMR_quartiles_log10 <- quantile(log10(sharks_PPMR), probs = c(0, 0.05, 0
 
 sharks_beta <- sharks_PPMR_quartiles[[3]]
 sharks_sigma <- sharks_PPMR_quartiles_log10[[4]] - sharks_PPMR_quartiles_log10[[2]]
+
+hist(log10(sharks_PPMR), freq = FALSE)
+lines(density(log10(sharks_PPMR)))
+abline(v = log10(sharks_beta), col = "darkgreen", lwd = 2)
+lines(x = c(sharks_PPMR_quartiles_log10[[2]], sharks_PPMR_quartiles_log10[[4]]), y = c(0.25, 0.25), col = "darkgreen", lwd = 2)
 ```
 
 ```{r}
@@ -321,4 +352,9 @@ rays_PPMR_quartiles_log10 <- quantile(log10(rays_PPMR), probs = c(0, 0.05, 0.5, 
 
 rays_beta <- rays_PPMR_quartiles[[3]]
 rays_sigma <- rays_PPMR_quartiles_log10[[4]] - rays_PPMR_quartiles_log10[[2]]
+
+hist(log10(rays_PPMR), freq = FALSE)
+lines(density(log10(rays_PPMR)))
+abline(v = log10(rays_beta), col = "darkgreen", lwd = 2)
+lines(x = c(rays_PPMR_quartiles_log10[[2]], rays_PPMR_quartiles_log10[[4]]), y = c(0.25, 0.25), col = "darkgreen", lwd = 2)
 ```

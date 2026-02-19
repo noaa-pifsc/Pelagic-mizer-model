@@ -99,6 +99,11 @@ umnk_PPMR_quartiles_log10 <- quantile(log10(umnk_PPMR), probs = c(0, 0.05, 0.5, 
 
 umnk_beta <- umnk_PPMR_quartiles[[3]]
 umnk_sigma <- umnk_PPMR_quartiles_log10[[4]] - umnk_PPMR_quartiles_log10[[2]]
+
+hist(log10(umnk_PPMR), freq = FALSE)
+lines(density(log10(umnk_PPMR)))
+abline(v = log10(umnk_beta), col = "darkgreen", lwd = 2)
+lines(x = c(umnk_PPMR_quartiles_log10[[2]], umnk_PPMR_quartiles_log10[[4]]), y = c(0.25, 0.25), col = "darkgreen", lwd = 2)
 ```
 
 
