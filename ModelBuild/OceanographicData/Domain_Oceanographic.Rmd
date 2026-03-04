@@ -344,40 +344,49 @@ ObsSets <- readRDS(here("ModelBuild", "FisheryData", "Obs_Details_HIonly.rds"))
 # And wrangle it to get what we want for plotting
 # Add year and month columns, just to make things easier.  
 # And an empty QUARTER column to fill later
+# Remove leading LLs from trip number and convert to numeric
 # Remove the experimental trip type column, since it's always NA
 ObsSets <- ObsSets |>
   mutate(YEAR = year(HAUL_BEGIN_DATETIME),
          MONTH = month(HAUL_BEGIN_DATETIME),
          Quarter = NA,
+         Trip_Numeric = as.numeric(str_sub(TRIP_NUM, 3, 7)),
          EXPR_TRIP_TYPE_ID = NULL)
 
 # Restrict ourselves to 1995 - 2024
 # First year when logbooks noted deep vs. shallow
 # Latest full year
-Obs9524 <- ObsSets |>
-  filter(YEAR >= 1995 & YEAR <= 2024)
+# Obs9524 <- ObsSets |>
+#   filter(YEAR >= 1995 & YEAR <= 2024)
+
+# Restrict ourselves to trip 2060+
+# First trip when the every-third-fish measurement protocol was implemented
+# Latest full year
+Obs2060 <- ObsSets |>
+  # filter(Trip_Numeric >= 2060)
+  filter(YEAR >= 2015)
 
 # Convert to 360-deg longitude
-neg_lon <- which(Obs9524$HAUL_BEGIN_LON < 0)
-Obs9524$HAUL_BEGIN_LON[neg_lon] <- Obs9524$HAUL_BEGIN_LON[neg_lon] + 360
+neg_lon <- which(Obs2060$HAUL_BEGIN_LON < 0)
+Obs2060$HAUL_BEGIN_LON[neg_lon] <- Obs2060$HAUL_BEGIN_LON[neg_lon] + 360
 
 # Fill Quarter column
 # I'm sure there's a tidy way to do this, but it's escaping me
-Q1 <- which(Obs9524$MONTH < 4)
-Q2 <- which(Obs9524$MONTH > 3 & Obs9524$MONTH < 7)
-Q3 <- which(Obs9524$MONTH > 6 & Obs9524$MONTH < 10)
-Q4 <- which(Obs9524$MONTH > 9)
-Obs9524$Quarter[Q1] <- 1
-Obs9524$Quarter[Q2] <- 2
-Obs9524$Quarter[Q3] <- 3
-Obs9524$Quarter[Q4] <- 4
+Q1 <- which(Obs2060$MONTH < 4)
+Q2 <- which(Obs2060$MONTH > 3 & Obs2060$MONTH < 7)
+Q3 <- which(Obs2060$MONTH > 6 & Obs2060$MONTH < 10)
+Q4 <- which(Obs2060$MONTH > 9)
+Obs2060$Quarter[Q1] <- 1
+Obs2060$Quarter[Q2] <- 2
+Obs2060$Quarter[Q3] <- 3
+Obs2060$Quarter[Q4] <- 4
 
 # Filter to shallow sets only
-Obs9524_Shallow <- Obs9524 |>
+Obs2060_Shallow <- Obs2060 |>
   filter(HKS_PER_FLT < 15)
 
 # Filter to shallow sets only
-Obs9524_Deep <- Obs9524 |>
+Obs2060_Deep <- Obs2060 |>
   filter(HKS_PER_FLT >= 15)
 ```
 
@@ -395,9 +404,9 @@ omz_map = ggplot(data = O2_ann_2mlpl, aes(x = lon, y = lat, z = depth)) +
   annotation_borders("world2", fill = "#A5AAAF")
 
 ocean_domain_map <- ggplot() +
-  geom_point(data = Obs9524_Deep, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Deep, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#003087") +
-  geom_point(data = Obs9524_Shallow, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Shallow, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#5EB6D9") +
   geom_contour(data = Temp_ann_t, aes(x = lon, y = lat, z = t_an),
                breaks = c(15), color = "red") +
@@ -405,10 +414,15 @@ ocean_domain_map <- ggplot() +
                breaks = c(200), color = "purple") +
   geom_contour(data = O2_ann_21mlpl, aes(x = lon, y = lat, z = depth),
                breaks = c(200), color = "purple4") +
+  geom_line(aes(x = c(180, 180), y = c(-25, 50)), color = "black") + 
   coord_quickmap(c(150, 250), ylim = c(-25, 50)) + 
   annotation_borders("world2", fill = "#A5AAAF")
 
 # png(here("ModelBuild", "OceanographicData", "ocean_domain_map_w2p1.png"), bg = "transparent")
+# ocean_domain_map
+# dev.off()
+
+# pdf(here("ModelBuild", "OceanographicData", "ocean_domain_map_w2p1.pdf"))
 # ocean_domain_map
 # dev.off()
 
@@ -428,9 +442,9 @@ O2_qtr_21mlpl_Q1 <- O2_qtr_21mlpl |>
 O2_qtr_2mlpl_Q1 <- O2_qtr_2mlpl |>
   filter(Quarter == 1)
 ocean_domain_map_Q1 <- ggplot() +
-  geom_point(data = Obs9524_Deep_Q1, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Deep_Q1, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#003087") +
-  geom_point(data = Obs9524_Shallow_Q1, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Shallow_Q1, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#5EB6D9") +
   geom_contour(data = Temp_qtr_t_Q1, aes(x = lon, y = lat, z = t_an),
                breaks = c(15), color = "red") +
@@ -456,9 +470,9 @@ O2_qtr_21mlpl_Q2 <- O2_qtr_21mlpl |>
 O2_qtr_2mlpl_Q2 <- O2_qtr_2mlpl |>
   filter(Quarter == 2)
 ocean_domain_map_Q2 <- ggplot() +
-  geom_point(data = Obs9524_Deep_Q2, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Deep_Q2, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#003087") +
-  geom_point(data = Obs9524_Shallow_Q2, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Shallow_Q2, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#5EB6D9") +
   geom_contour(data = Temp_qtr_t_Q2, aes(x = lon, y = lat, z = t_an),
                breaks = c(15), color = "red") +
@@ -484,9 +498,9 @@ O2_qtr_21mlpl_Q3 <- O2_qtr_21mlpl |>
 O2_qtr_2mlpl_Q3 <- O2_qtr_2mlpl |>
   filter(Quarter == 3)
 ocean_domain_map_Q3 <- ggplot() +
-  geom_point(data = Obs9524_Deep_Q3, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Deep_Q3, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#003087") +
-  geom_point(data = Obs9524_Shallow_Q3, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Shallow_Q3, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#5EB6D9") +
   geom_contour(data = Temp_qtr_t_Q3, aes(x = lon, y = lat, z = t_an),
                breaks = c(15), color = "red") +
@@ -512,9 +526,9 @@ O2_qtr_21mlpl_Q4 <- O2_qtr_21mlpl |>
 O2_qtr_2mlpl_Q4 <- O2_qtr_2mlpl |>
   filter(Quarter == 4)
 ocean_domain_map_Q4 <- ggplot() +
-  geom_point(data = Obs9524_Deep_Q4, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Deep_Q4, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#003087") +
-  geom_point(data = Obs9524_Shallow_Q4, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
+  geom_point(data = Obs2060_Shallow_Q4, aes(x = HAUL_BEGIN_LON, y = HAUL_BEGIN_LAT),
              shape = 21, color = "#5EB6D9") +
   geom_contour(data = Temp_qtr_t_Q4, aes(x = lon, y = lat, z = t_an),
                breaks = c(15), color = "red") +
