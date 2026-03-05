@@ -88,13 +88,19 @@ species_params <- species_params |>
   mutate(w_min = NA) |>
   mutate(w_mat = NA) |>
   mutate(depth_min = NA) |>
-  mutate(depth_max = NA)
+  mutate(depth_max = NA) |>
+  mutate(beta = NA) |>
+  mutate(sigma = NA) |>
+  mutate(age_mat = NA)
 
 species_params_refs <- species_params_refs |>
   mutate(w_min = NA) |>
   mutate(w_mat = NA)|>
   mutate(depth_min = NA) |>
-  mutate(depth_max = NA)
+  mutate(depth_max = NA) |>
+  mutate(beta = NA) |>
+  mutate(sigma = NA) |>
+  mutate(age_mat = NA)
 ```
 
 Now, use the functions:
@@ -123,26 +129,42 @@ species_params <- add_param_info(species_params, "Swordfish", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_min", 
                                  "default")
 
-# w_mat
+# w_mat & age_mat
 species_params <- add_param_info(species_params, "Lancetfish", "w_mat", 109)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_mat", 
                                  "@Gibbs1960, @Uchiyama2003")
+species_params <- add_param_info(species_params, "Lancetfish", "age_mat", 1)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "age_mat", 
+                                 "PlaceholderGuess")
+
 
 species_params <- add_param_info(species_params, "BigeyeTuna", "w_mat", 25373)
 species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "w_mat", 
                                  "@Farley2018, @Uchiyama2003")
+species_params <- add_param_info(species_params, "BigeyeTuna", "age_mat", 2.85)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "age_mat", 
+                                 "@Farlet2018")
 
 species_params <- add_param_info(species_params, "MahiMahi", "w_mat", 1024)
 species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "w_mat", 
                                  "@AlejoPlata2011, @Uchiyama2003")
+species_params <- add_param_info(species_params, "MahiMahi", "age_mat", 0.4)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "age_mat", 
+                                 "@Perrichon2019")
 
 species_params <- add_param_info(species_params, "BlueShark", "w_mat", 38867)
 species_params_refs <- add_param_info(species_params_refs, "BlueShark", "w_mat", 
+                                 "@ISC2022")
+species_params <- add_param_info(species_params, "BlueShark", "age_mat", 5.75)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "age_mat", 
                                  "@ISC2022")
 
 species_params <- add_param_info(species_params, "Swordfish", "w_mat", 33699)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_mat", 
                                  "@DeMartini2000, @DeMartini2007")
+species_params <- add_param_info(species_params, "Swordfish", "age_mat", )
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "age_mat", 
+                                 "")
 
 
 # w_max
@@ -207,6 +229,42 @@ species_params_refs <- add_param_info(species_params_refs, "BlueShark", "depth_m
 species_params <- add_param_info(species_params, "Swordfish", "depth_max", 1200)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "depth_max", 
                                  "@Abecassis2012")
+
+# beta & sigma
+species_params <- add_param_info(species_params, "Lancetfish", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "Lancetfish", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "sigma", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "BigeyeTuna", "beta", 6033)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "BigeyeTuna", "sigma", 2.6)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "sigma", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "MahiMahi", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "MahiMahi", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "sigma", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "BlueShark", "beta", 359)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "BlueShark", "sigma", 3.2)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "sigma", 
+                                 "@Barnes")
+
+species_params <- add_param_info(species_params, "Swordfish", "beta", 2263)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "Swordfish", "sigma", 2.2)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "sigma", 
+                                 "@Barnes2008")
 
 ```
 
