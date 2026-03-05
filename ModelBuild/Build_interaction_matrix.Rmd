@@ -1,0 +1,63 @@
+---
+title: "Build_interaction_matrix"
+output: html_document
+---
+
+# Purpose
+The purpose of this script is to build the interaction matrix for predators
+and prey.  This uses information on minimum and maximum depth following the 
+methodology used in [Woodworth-Jefcoats et al. 2019](https://doi.org/10.3389/fmars.2019.00383).
+
+This information is part of the species parameters created using Build_species_params.Rmd.
+
+```{r, message = FALSE} 
+# In the above line, `message = FALSE` suppresses some ignorable R messages
+# You can delete `, message = FALSE` if you want to see the messages
+
+# Set up the workspace
+library(tidyverse, quietly = TRUE) # handy for working with data frames
+library(here) # file path management that works on any operating system
+```
+
+```{r}
+# Load parameter data
+species_params <- read_csv(here("Pelagic_params.csv"), show_col_types = FALSE)
+```
+
+```{r}
+# Create empty matrix to fill with interactions
+# Columns are prey
+# Rows are predators
+# The matrix should be square
+interaction_matrix <- matrix(data = NA, 
+                             nrow = dim(species_params)[1], 
+                             ncol = dim(species_params)[1])
+row.names(interaction_matrix) <- species_params$species
+colnames(interaction_matrix) <- species_params$species
+```
+
+```{r}
+# Now, fill the matrix
+# Looping through all the species pairs
+for (prey in seq(1, dim(species_params)[1], 1)) {
+  for (pred in seq(1, dim(species_params)[1], 1)) {
+    D_pred <- species_params$depth_max[pred] - species_params$depth_min[pred]
+    D_prey <- species_params$depth_max[prey] - species_params$depth_min[prey]
+    
+    a <- max(species_params$depth_max[pred], species_params$depth_max[prey])
+    b <- min(species_params$depth_max[pred], species_params$depth_max[prey])
+    c <- max(species_params$depth_min[pred], species_params$depth_min[prey])
+    
+    D_ij <- a - (a - b) - c
+    
+    interaction_matrix[pred, prey] <- (D_ij^2) / (D_pred * D_prey)
+  }
+}
+```
+
+```{r}
+# Save interaction matrix
+write.csv(interaction_matrix, file = here("Pelagic_interaction.csv"), row.names = TRUE)
+```
+
+
