@@ -22,19 +22,26 @@ from scratch.  If you want to add new information, skip down to the section on
 updating the data frames.
 ```{r}
 # Build empty data frames 
-species_params <- data.frame(matrix(nrow = 1, ncol = 2,
+species_params <- data.frame(matrix(nrow =5, ncol = 2,
                                     dimnames = list(NULL, c("species",
                                                             "w_max"))))
 
-species_params_refs <- data.frame(matrix(nrow = 1, ncol = 2,
+species_params_refs <- data.frame(matrix(nrow = 5, ncol = 2,
                                          dimnames = list(NULL, c("species",
                                                                  "w_max"))))
 
-# Add the first species to each, picking one we're certain to use
-species_params$species[1] <- c("BigeyeTuna")
-species_params_refs$species[1] <- c("BigeyeTuna")
+# Add the first species to each, picking ones we're certain to use
+species_params$species <- c("Lancetfish", 
+                               "BigeyeTuna", 
+                               "BlueShark", 
+                               "MahiMahi", 
+                               "Swordfish")
+species_params_refs$species <- c("Lancetfish", 
+                                    "BigeyeTuna", 
+                                    "BlueShark", 
+                                    "MahiMahi", 
+                                    "Swordfish")
 ```
-
 
 # Update the data frames with parameters
 This code lets you add information to the data frames.  Start here if you're 
@@ -76,17 +83,131 @@ Load the existing parameters:
 
 To add a new parameter, use the `mutate` function:
 ```{r}
-# Add an empty column with the parameter name.  Here, that's w_mat
+# Add an empty column with the parameter name.  Here, that's w_min and w_mat
 species_params <- species_params |>
-  mutate(w_mat = NA)
+  mutate(w_min = NA) |>
+  mutate(w_mat = NA) |>
+  mutate(depth_min = NA) |>
+  mutate(depth_max = NA)
+
+species_params_refs <- species_params_refs |>
+  mutate(w_min = NA) |>
+  mutate(w_mat = NA)|>
+  mutate(depth_min = NA) |>
+  mutate(depth_max = NA)
 ```
 
 Now, use the functions:
 ```{r}
-species_params <- add_new_species(species_params, "YellowfinTuna")
-species_params_refs <- add_new_species(species_params_refs, "YellowfinTuna")
+# species_params <- add_new_species(species_params, "YellowfinTuna")
+# species_params_refs <- add_new_species(species_params_refs, "YellowfinTuna")
+# 
+# w_min
+species_params <- add_param_info(species_params, "Lancetfish", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_min", 
+                                 "default")
 
-species_params <- add_param_info(species_params, "BigeyeTuna", "w_max", 500)
+species_params <- add_param_info(species_params, "BigeyeTuna", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "w_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "MahiMahi", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "w_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "BlueShark", "w_min", 353)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "w_min", 
+                                 "@ISC2022")
+
+species_params <- add_param_info(species_params, "Swordfish", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_min", 
+                                 "default")
+
+# w_mat
+species_params <- add_param_info(species_params, "Lancetfish", "w_mat", 109)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_mat", 
+                                 "@Gibbs1960, @Uchiyama2003")
+
+species_params <- add_param_info(species_params, "BigeyeTuna", "w_mat", 25373)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "w_mat", 
+                                 "@Farley2018, @Uchiyama2003")
+
+species_params <- add_param_info(species_params, "MahiMahi", "w_mat", 1024)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "w_mat", 
+                                 "@AlejoPlata2011, @Uchiyama2003")
+
+species_params <- add_param_info(species_params, "BlueShark", "w_mat", 38867)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "w_mat", 
+                                 "@ISC2022")
+
+species_params <- add_param_info(species_params, "Swordfish", "w_mat", 33699)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_mat", 
+                                 "@DeMartini2000, @DeMartini2007")
+
+
+# w_max
+species_params <- add_param_info(species_params, "Lancetfish", "w_max", 8273)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_max", 
+                                 "@Portner2017, @Uchiyama2003")
+
+species_params <- add_param_info(species_params, "BigeyeTuna", "w_max", 95200)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "w_max", 
+                                 "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "MahiMahi", "w_max", 29800)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "w_max", 
+                                 "@Uchiyama2004")
+
+species_params <- add_param_info(species_params, "BlueShark", "w_max", 119968)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "w_max", 
+                                 "@ISC2017")
+
+species_params <- add_param_info(species_params, "Swordfish", "w_max", 181604)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_max", 
+                                 "@DeMartini2007")
+
+# depth_min
+species_params <- add_param_info(species_params, "Lancetfish", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "BigeyeTuna", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "MahiMahi", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "BlueShark", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "Swordfish", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "depth_min", 
+                                 "default")
+
+# depth_max
+species_params <- add_param_info(species_params, "Lancetfish", "depth_max", 1200)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "depth_max", 
+                                 "@Portner2017")
+
+species_params <- add_param_info(species_params, "BigeyeTuna", "depth_max", 500)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "depth_max", 
+                                 "@Howell2010")
+
+species_params <- add_param_info(species_params, "MahiMahi", "depth_max", 85)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "depth_max", 
+                                 "FishBase")
+
+species_params <- add_param_info(species_params, "BlueShark", "depth_max", 600)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "depth_max", 
+                                 "@Stevens2010")
+
+species_params <- add_param_info(species_params, "Swordfish", "depth_max", 1200)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "depth_max", 
+                                 "@Abecassis2012")
+
 ```
 
 # Save the updated parameters
@@ -95,6 +216,7 @@ the new parameter table(s) using the code below.  Remember to push the changes
 to the repo.  Otherwise, they'll only live on your computer.
 ```{r}
 # To be written
+write_csv(species_params, file = here("Pelagic_params.csv"))
 ```
 
 # Still to add
