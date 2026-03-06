@@ -133,9 +133,9 @@ species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_min",
 species_params <- add_param_info(species_params, "Lancetfish", "w_mat", 109)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_mat", 
                                  "@Gibbs1960, @Uchiyama2003")
-species_params <- add_param_info(species_params, "Lancetfish", "age_mat", 1)
+species_params <- add_param_info(species_params, "Lancetfish", "age_mat", 3)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "age_mat", 
-                                 "PlaceholderGuess")
+                                 "@Thorson2023, ExpertOpinion")
 
 
 species_params <- add_param_info(species_params, "BigeyeTuna", "w_mat", 25373)
@@ -159,16 +159,16 @@ species_params <- add_param_info(species_params, "BlueShark", "age_mat", 5.75)
 species_params_refs <- add_param_info(species_params_refs, "BlueShark", "age_mat", 
                                  "@ISC2022")
 
-species_params <- add_param_info(species_params, "Swordfish", "w_mat", 33699)
+species_params <- add_param_info(species_params, "Swordfish", "w_mat", 37019)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_mat", 
                                  "@DeMartini2000, @DeMartini2007")
-species_params <- add_param_info(species_params, "Swordfish", "age_mat", )
+species_params <- add_param_info(species_params, "Swordfish", "age_mat", 2)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "age_mat", 
-                                 "")
+                                 "@DeMartini2000, @DeMartini2007")
 
 
 # w_max
-species_params <- add_param_info(species_params, "Lancetfish", "w_max", 8273)
+species_params <- add_param_info(species_params, "Lancetfish", "w_max", 2873)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_max", 
                                  "@Portner2017, @Uchiyama2003")
 
@@ -184,7 +184,7 @@ species_params <- add_param_info(species_params, "BlueShark", "w_max", 119968)
 species_params_refs <- add_param_info(species_params_refs, "BlueShark", "w_max", 
                                  "@ISC2017")
 
-species_params <- add_param_info(species_params, "Swordfish", "w_max", 181604)
+species_params <- add_param_info(species_params, "Swordfish", "w_max", 202621)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_max", 
                                  "@DeMartini2007")
 
