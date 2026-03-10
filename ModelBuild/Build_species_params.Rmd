@@ -22,25 +22,31 @@ from scratch.  If you want to add new information, skip down to the section on
 updating the data frames.
 ```{r}
 # Build empty data frames 
-species_params <- data.frame(matrix(nrow =5, ncol = 2,
+species_params <- data.frame(matrix(nrow = 8, ncol = 2,
                                     dimnames = list(NULL, c("species",
                                                             "w_max"))))
 
-species_params_refs <- data.frame(matrix(nrow = 5, ncol = 2,
+species_params_refs <- data.frame(matrix(nrow = 8, ncol = 2,
                                          dimnames = list(NULL, c("species",
                                                                  "w_max"))))
 
 # Add the first species to each, picking ones we're certain to use
-species_params$species <- c("Lancetfish", 
-                               "BigeyeTuna", 
-                               "BlueShark", 
-                               "MahiMahi", 
-                               "Swordfish")
+species_params$species <- c("Lancetfish",
+                            "BigeyeTuna", 
+                            "BlueShark", 
+                            "MahiMahi", 
+                            "Swordfish",
+                            "YellowfinTuna",
+                            "SkipjackTuna",
+                            "AlbacoreTuna")
 species_params_refs$species <- c("Lancetfish", 
-                                    "BigeyeTuna", 
-                                    "BlueShark", 
-                                    "MahiMahi", 
-                                    "Swordfish")
+                                 "BigeyeTuna", 
+                                 "BlueShark", 
+                                 "MahiMahi", 
+                                 "Swordfish",
+                                 "YellowfinTuna", 
+                                 "SkipjackTuna", 
+                                 "AlbacoreTuna")
 ```
 
 # Update the data frames with parameters
@@ -78,7 +84,7 @@ add_param_info <- function(df_to_update, species_name, parameter_name, new_info)
 
 Load the existing parameters:
 ```{r}
-# To be written
+# To be written if used
 ```
 
 To add a new parameter, use the `mutate` function:
@@ -129,6 +135,18 @@ species_params <- add_param_info(species_params, "Swordfish", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_min", 
                                  "default")
 
+species_params <- add_param_info(species_params, "YellowfinTuna", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "w_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "SkipjackTuna", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "w_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "AlbacoreTuna", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "w_min", 
+                                 "default")
+
 # w_mat & age_mat
 species_params <- add_param_info(species_params, "Lancetfish", "w_mat", 109)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_mat", 
@@ -143,7 +161,7 @@ species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "w_mat"
                                  "@Farley2018, @Uchiyama2003")
 species_params <- add_param_info(species_params, "BigeyeTuna", "age_mat", 2.85)
 species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "age_mat", 
-                                 "@Farlet2018")
+                                 "@Farley2018")
 
 species_params <- add_param_info(species_params, "MahiMahi", "w_mat", 1024)
 species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "w_mat", 
@@ -166,6 +184,26 @@ species_params <- add_param_info(species_params, "Swordfish", "age_mat", 2)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "age_mat", 
                                  "@DeMartini2000, @DeMartini2007")
 
+species_params <- add_param_info(species_params, "YellowfinTuna", "w_mat", 25085)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "w_mat", 
+                                 "@Uchiyama2003, @Itano2000, @Magnusson2023")
+species_params <- add_param_info(species_params, "YellowfinTuna", "age_mat", 2)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "age_mat", 
+                                 "@Magnusson2023")
+
+species_params <- add_param_info(species_params, "SkipjackTuna", "w_mat", 1757)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "w_mat", 
+                                 "@Jordan2022, @Uchiyama2003")
+species_params <- add_param_info(species_params, "SkipjackTuna", "age_mat", 0.5)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "age_mat", 
+                                 "@Jordan2022")
+
+species_params <- add_param_info(species_params, "AlbacoreTuna", "w_mat", 14722)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "w_mat", 
+                                 "@Uchiyama2003, @AlbacoreWG")
+species_params <- add_param_info(species_params, "AlbacoreTuna", "age_mat", 5)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "age_mat", 
+                                 "@AlbacoreWG")
 
 # w_max
 species_params <- add_param_info(species_params, "Lancetfish", "w_max", 2873)
@@ -188,6 +226,18 @@ species_params <- add_param_info(species_params, "Swordfish", "w_max", 202621)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_max", 
                                  "@DeMartini2007")
 
+species_params <- add_param_info(species_params, "YellowfinTuna", "w_max", 93400)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "w_max", 
+                                 "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "SkipjackTuna", "w_max", 10400)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "w_max", 
+                                 "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "AlbacoreTuna", "w_max", 37200)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "w_max", 
+                                 "@Uchiyama2003")
+
 # depth_min
 species_params <- add_param_info(species_params, "Lancetfish", "depth_min", 0)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "depth_min", 
@@ -207,6 +257,18 @@ species_params_refs <- add_param_info(species_params_refs, "BlueShark", "depth_m
 
 species_params <- add_param_info(species_params, "Swordfish", "depth_min", 0)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "YellowfinTuna", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "SkipjackTuna", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "AlbacoreTuna", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "depth_min", 
                                  "default")
 
 # depth_max
@@ -229,6 +291,18 @@ species_params_refs <- add_param_info(species_params_refs, "BlueShark", "depth_m
 species_params <- add_param_info(species_params, "Swordfish", "depth_max", 1200)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "depth_max", 
                                  "@Abecassis2012")
+
+species_params <- add_param_info(species_params, "YellowfinTuna", "depth_max", 250)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "depth_max", 
+                                 "@Lam2020, @Schaefer2011")
+
+species_params <- add_param_info(species_params, "SkipjackTuna", "depth_max", 300)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "depth_max", 
+                                 "@Schaefer2007")
+
+species_params <- add_param_info(species_params, "AlbacoreTuna", "depth_max", 400)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "depth_max", 
+                                 "@Williams2015, @Duffy2017")
 
 # beta & sigma
 species_params <- add_param_info(species_params, "Lancetfish", "beta", 3646)
@@ -257,7 +331,7 @@ species_params_refs <- add_param_info(species_params_refs, "BlueShark", "beta",
                                  "@Barnes2008")
 species_params <- add_param_info(species_params, "BlueShark", "sigma", 3.2)
 species_params_refs <- add_param_info(species_params_refs, "BlueShark", "sigma", 
-                                 "@Barnes")
+                                 "@Barnes2008")
 
 species_params <- add_param_info(species_params, "Swordfish", "beta", 2263)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "beta", 
@@ -266,6 +340,26 @@ species_params <- add_param_info(species_params, "Swordfish", "sigma", 2.2)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "sigma", 
                                  "@Barnes2008")
 
+species_params <- add_param_info(species_params, "YellowfinTuna", "beta", 25185)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "YellowfinTuna", "sigma", 2.6)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "sigma", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "SkipjackTuna", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "SkipjackTuna", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "sigma", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "AlbacoreTuna", "beta", 12453)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "beta", 
+                                 "@Barnes2008, @Pinnegar2015, @Goni2014")
+species_params <- add_param_info(species_params, "AlbacoreTuna", "sigma", 2.7)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "sigma", 
+                                 "@Barnes2008, @Pinnegar2015, @Goni2014")
 ```
 
 # Save the updated parameters
@@ -273,13 +367,8 @@ If you're happy with your work and want to make it available to the team, save
 the new parameter table(s) using the code below.  Remember to push the changes
 to the repo.  Otherwise, they'll only live on your computer.
 ```{r}
-# To be written
+# Save the parameters
 write_csv(species_params, file = here("Pelagic_params.csv"))
 ```
 
-# Still to add
-The idea for the `_refs` data frame is to keep track of the reference for each
-parameter.  In a perfect world, we'd populate the data frame with the tags from 
-the references.bib table.  But this works best with newer papers.  So, we can 
-also populate with citation strings (e.g., Smith et al. 2025).  Still to figure 
-out: the best place to record the full citations.  
+
