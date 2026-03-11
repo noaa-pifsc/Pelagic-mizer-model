@@ -22,11 +22,11 @@ from scratch.  If you want to add new information, skip down to the section on
 updating the data frames.
 ```{r}
 # Build empty data frames 
-species_params <- data.frame(matrix(nrow = 8, ncol = 2,
+species_params <- data.frame(matrix(nrow = 10, ncol = 2,
                                     dimnames = list(NULL, c("species",
                                                             "w_max"))))
 
-species_params_refs <- data.frame(matrix(nrow = 8, ncol = 2,
+species_params_refs <- data.frame(matrix(nrow = 10, ncol = 2,
                                          dimnames = list(NULL, c("species",
                                                                  "w_max"))))
 
@@ -38,7 +38,9 @@ species_params$species <- c("Lancetfish",
                             "Swordfish",
                             "YellowfinTuna",
                             "SkipjackTuna",
-                            "AlbacoreTuna")
+                            "AlbacoreTuna",
+                            "StripedMarlin",
+                            "Wahoo")
 species_params_refs$species <- c("Lancetfish", 
                                  "BigeyeTuna", 
                                  "BlueShark", 
@@ -46,7 +48,9 @@ species_params_refs$species <- c("Lancetfish",
                                  "Swordfish",
                                  "YellowfinTuna", 
                                  "SkipjackTuna", 
-                                 "AlbacoreTuna")
+                                 "AlbacoreTuna",
+                                 "StripedMarlin",
+                                 "Wahoo")
 ```
 
 # Update the data frames with parameters
@@ -147,6 +151,14 @@ species_params <- add_param_info(species_params, "AlbacoreTuna", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "w_min", 
                                  "default")
 
+species_params <- add_param_info(species_params, "StripedMarlin", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "w_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "Wahoo", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "w_min", 
+                                 "default")
+
 # w_mat & age_mat
 species_params <- add_param_info(species_params, "Lancetfish", "w_mat", 109)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_mat", 
@@ -205,6 +217,20 @@ species_params <- add_param_info(species_params, "AlbacoreTuna", "age_mat", 5)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "age_mat", 
                                  "@AlbacoreWG")
 
+species_params <- add_param_info(species_params, "StripedMarlin", "w_mat", 48229)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "w_mat", 
+                                 "@BillfishWG")
+species_params <- add_param_info(species_params, "StripedMarlin", "age_mat", 2.3)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "age_mat", 
+                                 "@BillfishWG")
+
+species_params <- add_param_info(species_params, "Wahoo", "w_mat", 7120)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "w_mat", 
+                                 "@BrownPeterson2000, @Viana2013, @Zischke2013ICES, @Zischke2013RFBF")
+species_params <- add_param_info(species_params, "Wahoo", "age_mat", 0.75)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "age_mat", 
+                                 "@Zischke2013RFBF, @MakiJenkins2009, @Kindong2022")
+
 # w_max
 species_params <- add_param_info(species_params, "Lancetfish", "w_max", 2873)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_max", 
@@ -237,6 +263,14 @@ species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "w_ma
 species_params <- add_param_info(species_params, "AlbacoreTuna", "w_max", 37200)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "w_max", 
                                  "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "StripedMarlin", "w_max", 92754)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "w_max", 
+                                 "@BillfishWG")
+
+species_params <- add_param_info(species_params, "Wahoo", "w_max", 41715)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "w_max", 
+                                 "@Viana2013, @Zischke2013ICES, @Zischke2013RFBF, @Kindong2022, @Oyafuso2016, @McBride2008")
 
 # depth_min
 species_params <- add_param_info(species_params, "Lancetfish", "depth_min", 0)
@@ -271,6 +305,14 @@ species_params <- add_param_info(species_params, "AlbacoreTuna", "depth_min", 0)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "depth_min", 
                                  "default")
 
+species_params <- add_param_info(species_params, "StripedMarlin", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "Wahoo", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "depth_min", 
+                                 "default")
+
 # depth_max
 species_params <- add_param_info(species_params, "Lancetfish", "depth_max", 1200)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "depth_max", 
@@ -303,6 +345,14 @@ species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "dept
 species_params <- add_param_info(species_params, "AlbacoreTuna", "depth_max", 400)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "depth_max", 
                                  "@Williams2015, @Duffy2017")
+
+species_params <- add_param_info(species_params, "StripedMarlin", "depth_max", 200)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "depth_max", 
+                                 "FishBase, @Sipple2007")
+
+species_params <- add_param_info(species_params, "Wahoo", "depth_max", 20)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "depth_max", 
+                                 "FishBase, @Sepulveda2011")
 
 # beta & sigma
 species_params <- add_param_info(species_params, "Lancetfish", "beta", 3646)
@@ -360,6 +410,20 @@ species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "beta
 species_params <- add_param_info(species_params, "AlbacoreTuna", "sigma", 2.7)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "sigma", 
                                  "@Barnes2008, @Pinnegar2015, @Goni2014")
+
+species_params <- add_param_info(species_params, "StripedMarlin", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "StripedMarlin", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "sigma", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "Wahoo", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "Wahoo", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "sigma", 
+                                 "@Barnes2008")
 ```
 
 # Save the updated parameters
