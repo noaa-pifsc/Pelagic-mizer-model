@@ -22,11 +22,11 @@ from scratch.  If you want to add new information, skip down to the section on
 updating the data frames.
 ```{r}
 # Build empty data frames 
-species_params <- data.frame(matrix(nrow = 10, ncol = 2,
+species_params <- data.frame(matrix(nrow = 13, ncol = 2,
                                     dimnames = list(NULL, c("species",
                                                             "w_max"))))
 
-species_params_refs <- data.frame(matrix(nrow = 10, ncol = 2,
+species_params_refs <- data.frame(matrix(nrow = 13, ncol = 2,
                                          dimnames = list(NULL, c("species",
                                                                  "w_max"))))
 
@@ -40,7 +40,10 @@ species_params$species <- c("Lancetfish",
                             "SkipjackTuna",
                             "AlbacoreTuna",
                             "StripedMarlin",
-                            "Wahoo")
+                            "Wahoo",
+                            "Opah",
+                            "BlueMarlin",
+                            "ShortfinMakoShark")
 species_params_refs$species <- c("Lancetfish", 
                                  "BigeyeTuna", 
                                  "BlueShark", 
@@ -50,7 +53,10 @@ species_params_refs$species <- c("Lancetfish",
                                  "SkipjackTuna", 
                                  "AlbacoreTuna",
                                  "StripedMarlin",
-                                 "Wahoo")
+                                 "Wahoo",
+                                 "Opah",
+                                 "BlueMarlin",
+                                 "ShortfinMakoShark")
 ```
 
 # Update the data frames with parameters
@@ -113,11 +119,16 @@ species_params_refs <- species_params_refs |>
   mutate(age_mat = NA)
 ```
 
-Now, use the functions:
+Now, use the functions.  Here, they're chunked by parameter.  Further down, they
+are organize by species.
 ```{r}
+# Example
 # species_params <- add_new_species(species_params, "YellowfinTuna")
 # species_params_refs <- add_new_species(species_params_refs, "YellowfinTuna")
-# 
+```
+
+w_min
+```{r}
 # w_min
 species_params <- add_param_info(species_params, "Lancetfish", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_min", 
@@ -159,6 +170,17 @@ species_params <- add_param_info(species_params, "Wahoo", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "Wahoo", "w_min", 
                                  "default")
 
+species_params <- add_param_info(species_params, "Opah", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "w_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "BlueMarlin", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "w_min", 
+                                 "default")
+```
+
+w_mat & age_mat
+```{r}
 # w_mat & age_mat
 species_params <- add_param_info(species_params, "Lancetfish", "w_mat", 109)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_mat", 
@@ -231,6 +253,23 @@ species_params <- add_param_info(species_params, "Wahoo", "age_mat", 0.75)
 species_params_refs <- add_param_info(species_params_refs, "Wahoo", "age_mat", 
                                  "@Zischke2013RFBF, @MakiJenkins2009, @Kindong2022")
 
+species_params <- add_param_info(species_params, "Opah", "w_mat", 19382)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "w_mat", 
+                                 "@Sundberg2011, @Francis2004")
+species_params <- add_param_info(species_params, "Opah", "age_mat", 4.3)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "age_mat", 
+                                 "@Francis2004")
+
+species_params <- add_param_info(species_params, "BlueMarlin", "w_mat", 77473)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "w_mat", 
+                                 "@BillfishWG2021")
+species_params <- add_param_info(species_params, "BlueMarlin", "age_mat", 3)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "age_mat", 
+                                 "@BillfishWG2021")
+```
+
+w_max
+```{r}
 # w_max
 species_params <- add_param_info(species_params, "Lancetfish", "w_max", 2873)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_max", 
@@ -272,6 +311,17 @@ species_params <- add_param_info(species_params, "Wahoo", "w_max", 41715)
 species_params_refs <- add_param_info(species_params_refs, "Wahoo", "w_max", 
                                  "@Viana2013, @Zischke2013ICES, @Zischke2013RFBF, @Kindong2022, @Oyafuso2016, @McBride2008")
 
+species_params <- add_param_info(species_params, "Opah", "w_max", 89000)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "w_max", 
+                                 "@Hawn2012")
+
+species_params <- add_param_info(species_params, "BlueMarlin", "w_max", 455400)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "w_max", 
+                                 "@Uchiyama2003")
+```
+
+depth_min
+```{r}
 # depth_min
 species_params <- add_param_info(species_params, "Lancetfish", "depth_min", 0)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "depth_min", 
@@ -313,6 +363,17 @@ species_params <- add_param_info(species_params, "Wahoo", "depth_min", 0)
 species_params_refs <- add_param_info(species_params_refs, "Wahoo", "depth_min", 
                                  "default")
 
+species_params <- add_param_info(species_params, "Opah", "depth_min", 50)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "depth_min", 
+                                 "@Polovina2008")
+
+species_params <- add_param_info(species_params, "BlueMarlin", "depth_min", 50)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "depth_min", 
+                                 "default")
+```
+
+depth_max
+```{r}
 # depth_max
 species_params <- add_param_info(species_params, "Lancetfish", "depth_max", 1200)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "depth_max", 
@@ -354,6 +415,17 @@ species_params <- add_param_info(species_params, "Wahoo", "depth_max", 20)
 species_params_refs <- add_param_info(species_params_refs, "Wahoo", "depth_max", 
                                  "FishBase, @Sepulveda2011")
 
+species_params <- add_param_info(species_params, "Opah", "depth_max", 400)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "depth_max", 
+                                 "@Polovina2008")
+
+species_params <- add_param_info(species_params, "BlueMarlin", "depth_max", 100)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "depth_max", 
+                                 "@Holland1990")
+```
+
+beta & sigma
+```{r}
 # beta & sigma
 species_params <- add_param_info(species_params, "Lancetfish", "beta", 3646)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "beta", 
@@ -424,7 +496,57 @@ species_params_refs <- add_param_info(species_params_refs, "Wahoo", "beta",
 species_params <- add_param_info(species_params, "Wahoo", "sigma", 4.0)
 species_params_refs <- add_param_info(species_params_refs, "Wahoo", "sigma", 
                                  "@Barnes2008")
+
+species_params <- add_param_info(species_params, "Opah", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "Opah", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "sigma", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "BlueMarlin", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "beta", 
+                                 "@Barnes2008")
+species_params <- add_param_info(species_params, "BlueMarlin", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "sigma", 
+                                 "@Barnes2008")
 ```
+
+Shortfin Mako Shark
+```{r}
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "w_min", 2404)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "w_min", 
+                                 "@CZ2018")
+
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "w_mat", 122503)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "w_mat", 
+                                 "@Mako2024a, @Mako2024r")
+
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "age_mat", 10)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "age_mat", 
+                                 "@Mako2024a")
+
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "w_max", 373993)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "w_max", 
+                                 "@Mako2024a, @Mako2024r")
+
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "depth_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "depth_max", 200)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "depth_max", 
+                                 "@NL2019")
+
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "beta", 359)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "beta", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "sigma", 3.2)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "sigma", 
+                                 "@Barnes2008")
+```
+
 
 # Save the updated parameters
 If you're happy with your work and want to make it available to the team, save
