@@ -22,11 +22,11 @@ from scratch.  If you want to add new information, skip down to the section on
 updating the data frames.
 ```{r}
 # Build empty data frames 
-species_params <- data.frame(matrix(nrow = 13, ncol = 2,
+species_params <- data.frame(matrix(nrow = 16, ncol = 2,
                                     dimnames = list(NULL, c("species",
                                                             "w_max"))))
 
-species_params_refs <- data.frame(matrix(nrow = 13, ncol = 2,
+species_params_refs <- data.frame(matrix(nrow = 16, ncol = 2,
                                          dimnames = list(NULL, c("species",
                                                                  "w_max"))))
 
@@ -43,7 +43,10 @@ species_params$species <- c("Lancetfish",
                             "Wahoo",
                             "Opah",
                             "BlueMarlin",
-                            "ShortfinMakoShark")
+                            "ShortfinMakoShark",
+                            "Pomfret",
+                            "ShortbillSpearfish",
+                            "OceanicWhitetipShark")
 species_params_refs$species <- c("Lancetfish", 
                                  "BigeyeTuna", 
                                  "BlueShark", 
@@ -56,7 +59,10 @@ species_params_refs$species <- c("Lancetfish",
                                  "Wahoo",
                                  "Opah",
                                  "BlueMarlin",
-                                 "ShortfinMakoShark")
+                                 "ShortfinMakoShark",
+                                 "Pomfret",
+                                 "ShortbillSpearfish",
+                                 "OceanicWhitetipShark")
 ```
 
 # Update the data frames with parameters
@@ -101,22 +107,23 @@ To add a new parameter, use the `mutate` function:
 ```{r}
 # Add an empty column with the parameter name.  Here, that's w_min and w_mat
 species_params <- species_params |>
-  mutate(w_min = NA) |>
   mutate(w_mat = NA) |>
+  mutate(age_mat = NA) |>
+  mutate(w_min = NA) |>
   mutate(depth_min = NA) |>
   mutate(depth_max = NA) |>
   mutate(beta = NA) |>
-  mutate(sigma = NA) |>
-  mutate(age_mat = NA)
+  mutate(sigma = NA)
+  
 
 species_params_refs <- species_params_refs |>
-  mutate(w_min = NA) |>
-  mutate(w_mat = NA)|>
+  mutate(w_mat = NA) |>
+  mutate(age_mat = NA) |>
+  mutate(w_min = NA)|>
   mutate(depth_min = NA) |>
   mutate(depth_max = NA) |>
   mutate(beta = NA) |>
-  mutate(sigma = NA) |>
-  mutate(age_mat = NA)
+  mutate(sigma = NA) 
 ```
 
 Now, use the functions.  Here, they're chunked by parameter.  Further down, they
@@ -367,7 +374,7 @@ species_params <- add_param_info(species_params, "Opah", "depth_min", 50)
 species_params_refs <- add_param_info(species_params_refs, "Opah", "depth_min", 
                                  "@Polovina2008")
 
-species_params <- add_param_info(species_params, "BlueMarlin", "depth_min", 50)
+species_params <- add_param_info(species_params, "BlueMarlin", "depth_min", 0)
 species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "depth_min", 
                                  "default")
 ```
@@ -547,6 +554,145 @@ species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", 
                                  "@Barnes2008")
 ```
 
+Pomfret
+```{r}
+species_params <- add_param_info(species_params, "Pomfret", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "w_min", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "Pomfret", "w_mat", 539)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "w_mat", 
+                                 "@Bigelow1995")
+
+species_params <- add_param_info(species_params, "Pomfret", "age_mat", 1)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "age_mat", 
+                                 "@Bigelow1995")
+
+species_params <- add_param_info(species_params, "Pomfret", "w_max", 9000)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "w_max", 
+                                 "@WPRFMC2005")
+
+species_params <- add_param_info(species_params, "Pomfret", "depth_min", 100)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "depth_min", 
+                                 "@Gray2016")
+
+species_params <- add_param_info(species_params, "Pomfret", "depth_max", 450)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "depth_max", 
+                                 "@Gray2016")
+
+species_params <- add_param_info(species_params, "Pomfret", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "beta", 
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "Pomfret", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "sigma", 
+                                 "@Barnes2008")
+```
+
+Shortbill spearfish
+```{r}
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "w_min", 0.001)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "w_min",
+                                 "default")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "w_mat", 7719)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "w_mat",
+                                 "@Thorson2023, @Uchiyama2003")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "age_mat", 2)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "age_mat",
+                                 "@Thorson2023")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "w_max", 23500)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "w_max",
+                                 "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "depth_min", 0)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "depth_min",
+                                 "default")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "depth_max", 250)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "depth_max",
+                                 "@Shimose2010")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "beta", 3646)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "beta",
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "sigma", 4.0)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "sigma",
+                                 "@Barnes2008")
+```
+
+Oceanic Whitetip Shark
+```{r}
+species_params <- add_param_info(species_params, "", "w_min", )
+species_params_refs <- add_param_info(species_params_refs, "", "w_min",
+                                 "")
+
+species_params <- add_param_info(species_params, "", "w_mat", )
+species_params_refs <- add_param_info(species_params_refs, "", "w_mat",
+                                 "")
+
+species_params <- add_param_info(species_params, "", "age_mat", )
+species_params_refs <- add_param_info(species_params_refs, "", "age_mat",
+                                 "")
+
+species_params <- add_param_info(species_params, "", "w_max", )
+species_params_refs <- add_param_info(species_params_refs, "", "w_max",
+                                 "")
+
+species_params <- add_param_info(species_params, "", "depth_min", )
+species_params_refs <- add_param_info(species_params_refs, "", "depth_min",
+                                 "")
+
+species_params <- add_param_info(species_params, "", "depth_max", )
+species_params_refs <- add_param_info(species_params_refs, "", "depth_max",
+                                 "")
+
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "beta", 359)
+species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "beta",
+                                 "@Barnes2008")
+
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "sigma", 3.2)
+species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "sigma",
+                                 "@Barnes2008")
+```
+
+Species
+```{r}
+# species_params <- add_param_info(species_params, "", "w_min", )
+# species_params_refs <- add_param_info(species_params_refs, "", "w_min", 
+#                                  "")
+# 
+# species_params <- add_param_info(species_params, "", "w_mat", )
+# species_params_refs <- add_param_info(species_params_refs, "", "w_mat", 
+#                                  "")
+# 
+# species_params <- add_param_info(species_params, "", "age_mat", )
+# species_params_refs <- add_param_info(species_params_refs, "", "age_mat", 
+#                                  "")
+# 
+# species_params <- add_param_info(species_params, "", "w_max", )
+# species_params_refs <- add_param_info(species_params_refs, "", "w_max", 
+#                                  "")
+# 
+# species_params <- add_param_info(species_params, "", "depth_min", )
+# species_params_refs <- add_param_info(species_params_refs, "", "depth_min", 
+#                                  "")
+# 
+# species_params <- add_param_info(species_params, "", "depth_max", )
+# species_params_refs <- add_param_info(species_params_refs, "", "depth_max", 
+#                                  "")
+# 
+# species_params <- add_param_info(species_params, "", "beta", )
+# species_params_refs <- add_param_info(species_params_refs, "", "beta", 
+#                                  "")
+# 
+# species_params <- add_param_info(species_params, "", "sigma", )
+# species_params_refs <- add_param_info(species_params_refs, "", "sigma", 
+#                                  "")
+```
 
 # Save the updated parameters
 If you're happy with your work and want to make it available to the team, save
