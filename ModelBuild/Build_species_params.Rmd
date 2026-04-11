@@ -109,7 +109,7 @@ Load the existing parameters:
 
 To add a new parameter, use the `mutate` function:
 ```{r}
-# Add an empty column with the parameter name.  Here, that's w_min and w_mat
+# Add an empty column with the parameter name.  
 species_params <- species_params |>
   mutate(w_mat = NA) |>
   mutate(age_mat = NA) |>
@@ -118,7 +118,13 @@ species_params <- species_params |>
   mutate(depth_min = NA) |>
   mutate(depth_max = NA) |>
   mutate(beta = NA) |>
-  mutate(sigma = NA)
+  mutate(sigma = NA) |>
+  mutate(a = NA) |>
+  mutate(b = NA) |>
+  mutate(l_min = NA) |>
+  mutate(l_mat = NA) |>
+  mutate(l_max = NA) |>
+  mutate(catchability = NA)
   
 
 species_params_refs <- species_params_refs |>
@@ -129,7 +135,13 @@ species_params_refs <- species_params_refs |>
   mutate(depth_min = NA) |>
   mutate(depth_max = NA) |>
   mutate(beta = NA) |>
-  mutate(sigma = NA) 
+  mutate(sigma = NA) |>
+  mutate(a = NA) |>
+  mutate(b = NA) |>
+  mutate(l_min = NA) |>
+  mutate(l_mat = NA) |>
+  mutate(l_max = NA) |>
+  mutate(catchability = NA)
 ```
 
 Now, use the functions.  Here, they're chunked by parameter.  Further down, they
@@ -192,20 +204,28 @@ species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "w_min"
                                  "default")
 ```
 
-w_mat & age_mat
+l_min
+```{r}
+# Omitting l_min for these initial 12 species because they either:
+# - use the default min (teleosts) or
+# - have sexually dimorphic L-W conversions
+```
+
+w_mat & l_mat & age_mat
 ```{r}
 # w_mat & age_mat
 species_params <- add_param_info(species_params, "Lancetfish", "w_mat", 109)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_mat", 
                                  "@Gibbs1960, @Uchiyama2003")
+# Lancetfish: no l_mat
 species_params <- add_param_info(species_params, "Lancetfish", "age_mat", 3)
 species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "age_mat", 
                                  "@Thorson2023, ExpertOpinion")
 
-
-species_params <- add_param_info(species_params, "BigeyeTuna", "w_mat", 25373)
-species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "w_mat", 
-                                 "@Farley2018, @Uchiyama2003")
+# BigeyeTuna: calculating from w_mat from l_mat
+species_params <- add_param_info(species_params, "BigeyeTuna", "l_mat", 121.97)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "l_mat", 
+                                      "@Huang2023")
 species_params <- add_param_info(species_params, "BigeyeTuna", "age_mat", 2.85)
 species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "age_mat", 
                                  "@Farley2018")
@@ -213,6 +233,7 @@ species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "age_ma
 species_params <- add_param_info(species_params, "MahiMahi", "w_mat", 1024)
 species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "w_mat", 
                                  "@AlejoPlata2011, @Uchiyama2003")
+# MahiMahi: w_mat averaged from sexually dimorphic l_mat values
 species_params <- add_param_info(species_params, "MahiMahi", "age_mat", 0.4)
 species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "age_mat", 
                                  "@Perrichon2019")
@@ -220,6 +241,7 @@ species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "age_mat"
 species_params <- add_param_info(species_params, "BlueShark", "w_mat", 38867)
 species_params_refs <- add_param_info(species_params_refs, "BlueShark", "w_mat", 
                                  "@ISC2022")
+# BlueShark: w_mat averaged from sexually dimorphic l_mat values
 species_params <- add_param_info(species_params, "BlueShark", "age_mat", 5.75)
 species_params_refs <- add_param_info(species_params_refs, "BlueShark", "age_mat", 
                                  "@ISC2022")
@@ -227,41 +249,47 @@ species_params_refs <- add_param_info(species_params_refs, "BlueShark", "age_mat
 species_params <- add_param_info(species_params, "Swordfish", "w_mat", 37019)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_mat", 
                                  "@DeMartini2000, @DeMartini2007")
+# Swordfish: w_mat averaged from sexually dimorphic l_mat values
 species_params <- add_param_info(species_params, "Swordfish", "age_mat", 2)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "age_mat", 
                                  "@DeMartini2000, @DeMartini2007")
 
-species_params <- add_param_info(species_params, "YellowfinTuna", "w_mat", 25085)
-species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "w_mat", 
-                                 "@Uchiyama2003, @Itano2000, @Magnusson2023")
+# YellowfinTuna: w_mat calculated from l_mat
+species_params <- add_param_info(species_params, "YellowfinTuna", "l_mat", 110)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "l_mat", 
+                                      "@Itano2000, @Magnusson2023")
 species_params <- add_param_info(species_params, "YellowfinTuna", "age_mat", 2)
 species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "age_mat", 
                                  "@Magnusson2023")
 
-species_params <- add_param_info(species_params, "SkipjackTuna", "w_mat", 1757)
-species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "w_mat", 
-                                 "@Jordan2022, @Uchiyama2003")
-species_params <- add_param_info(species_params, "SkipjackTuna", "age_mat", 0.5)
+# SkipjackTuna: w_mat calculated from l_mat
+species_params <- add_param_info(species_params, "SkipjackTuna", "l_mat", 45)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "l_mat", 
+                                      "@Jordan2022")
+species_params <- add_param_info(species_params, "SkipjackTuna", "age_mat", 3.75)
 species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "age_mat", 
-                                 "@Jordan2022")
+                                 "@Teears2025")
 
-species_params <- add_param_info(species_params, "AlbacoreTuna", "w_mat", 14722)
-species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "w_mat", 
-                                 "@Uchiyama2003, @AlbacoreWG")
+#AlbacoreTuna: w_mat calculated from l_mat
+species_params <- add_param_info(species_params, "AlbacoreTuna", "l_mat", 89)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "l_mat", 
+                                      "@AlbacoreWG")
 species_params <- add_param_info(species_params, "AlbacoreTuna", "age_mat", 5)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "age_mat", 
                                  "@AlbacoreWG")
 
-species_params <- add_param_info(species_params, "StripedMarlin", "w_mat", 48229)
-species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "w_mat", 
-                                 "@BillfishWG")
+# StripedMarlin: w_mat calculated from l_mat
+species_params <- add_param_info(species_params, "StripedMarlin", "l_mat", 165.7)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "l_mat", 
+                                      "@BillfishWG")
 species_params <- add_param_info(species_params, "StripedMarlin", "age_mat", 2.3)
 species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "age_mat", 
                                  "@BillfishWG")
 
-species_params <- add_param_info(species_params, "Wahoo", "w_mat", 7120)
-species_params_refs <- add_param_info(species_params_refs, "Wahoo", "w_mat", 
-                                 "@BrownPeterson2000, @Viana2013, @Zischke2013ICES, @Zischke2013RFBF")
+# Wahoo: w_mat calculated from l_mat
+species_params <- add_param_info(species_params, "Wahoo", "l_mat", 105)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "l_mat", 
+                                      "@BrownPeterson2000, @Viana2013, @Zischke2013RFBF")
 species_params <- add_param_info(species_params, "Wahoo", "age_mat", 0.75)
 species_params_refs <- add_param_info(species_params_refs, "Wahoo", "age_mat", 
                                  "@Zischke2013RFBF, @MakiJenkins2009, @Kindong2022")
@@ -269,6 +297,7 @@ species_params_refs <- add_param_info(species_params_refs, "Wahoo", "age_mat",
 species_params <- add_param_info(species_params, "Opah", "w_mat", 19382)
 species_params_refs <- add_param_info(species_params_refs, "Opah", "w_mat", 
                                  "@Sundberg2011, @Francis2004")
+# Opah: w_mat averaged from sexually dimorphic l_mat values
 species_params <- add_param_info(species_params, "Opah", "age_mat", 4.3)
 species_params_refs <- add_param_info(species_params_refs, "Opah", "age_mat", 
                                  "@Francis2004")
@@ -276,61 +305,74 @@ species_params_refs <- add_param_info(species_params_refs, "Opah", "age_mat",
 species_params <- add_param_info(species_params, "BlueMarlin", "w_mat", 77473)
 species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "w_mat", 
                                  "@BillfishWG2021")
+# BlueMarlin: w_mat averaged from sexually dimorphic l_mat values
 species_params <- add_param_info(species_params, "BlueMarlin", "age_mat", 3)
 species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "age_mat", 
                                  "@BillfishWG2021")
 ```
 
-w_max
+w_max & l_max
 ```{r}
 # w_max
-species_params <- add_param_info(species_params, "Lancetfish", "w_max", 8332)
-species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "w_max", 
-                                 "@Portner2017, @Uchiyama2003")
+# Lancetfish: w_max calculated from l_max
+species_params <- add_param_info(species_params, "Lancetfish", "l_max", 168)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "l_max", 
+                                      "@Portner2017")
 
 species_params <- add_param_info(species_params, "BigeyeTuna", "w_max", 95200)
 species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "w_max", 
                                  "@Uchiyama2003")
+# BigeyeTuna: w_max taken directly from reference 
 
 species_params <- add_param_info(species_params, "MahiMahi", "w_max", 29800)
 species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "w_max", 
-                                 "@Uchiyama2004")
+                                 "@Uchiyama2006")
+# MahiMahi: w_max taken directly from reference
 
 species_params <- add_param_info(species_params, "BlueShark", "w_max", 119968)
 species_params_refs <- add_param_info(species_params_refs, "BlueShark", "w_max", 
                                  "@ISC2017")
+# BlueShark: w_max averaged from sexually dimorphic L-W conversions
 
 species_params <- add_param_info(species_params, "Swordfish", "w_max", 202621)
 species_params_refs <- add_param_info(species_params_refs, "Swordfish", "w_max", 
                                  "@DeMartini2007")
+# Swordfish: w_max averaged using sexually dimorphic l_max values
 
 species_params <- add_param_info(species_params, "YellowfinTuna", "w_max", 93400)
 species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "w_max", 
                                  "@Uchiyama2003")
+# YellowfinTuna: w_max taken directly from reference
 
 species_params <- add_param_info(species_params, "SkipjackTuna", "w_max", 10400)
 species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "w_max", 
                                  "@Uchiyama2003")
+# SkipjackTuna: w_max taken directly from reference
 
 species_params <- add_param_info(species_params, "AlbacoreTuna", "w_max", 37200)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "w_max", 
                                  "@Uchiyama2003")
+# AlbacoreTuna: w_max taken directly from reference
 
-species_params <- add_param_info(species_params, "StripedMarlin", "w_max", 92754)
-species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "w_max", 
-                                 "@BillfishWG")
+# StripedMarlin: w_max calculated from l_max
+species_params <- add_param_info(species_params, "StripedMarlin", "l_max", 203.8)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "l_max", 
+                                      "@BillfishWG")
 
-species_params <- add_param_info(species_params, "Wahoo", "w_max", 41715)
-species_params_refs <- add_param_info(species_params_refs, "Wahoo", "w_max", 
-                                 "@Viana2013, @Zischke2013ICES, @Zischke2013RFBF, @Kindong2022, @Oyafuso2016, @McBride2008")
+# Wahoo: w_max calculated from l_max
+species_params <- add_param_info(species_params, "Wahoo", "l_max", 180)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "l_max", 
+                                      "@Viana2013, @Zischke2013ICES, @Kindong2022, @Oyafuso2016, @McBride2008")
 
 species_params <- add_param_info(species_params, "Opah", "w_max", 89000)
 species_params_refs <- add_param_info(species_params_refs, "Opah", "w_max", 
                                  "@Hawn2012")
+# Opah: w_max taken directly from reference
 
 species_params <- add_param_info(species_params, "BlueMarlin", "w_max", 455400)
 species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "w_max", 
                                  "@Uchiyama2003")
+# BlueMarlin: w_max taken directly from reference
 ```
 
 R_max
@@ -339,8 +381,21 @@ R_max
 # below if the actual value is reasonably known
 species_params$R_max <- round(1e11 * species_params$w_max^-1.5)
 species_params_refs$R_max <- "default"
-```
 
+# mizer will calculate weights from lengths, but we need the w_max values to get
+# the R_max values, so working around this here
+species_params <- add_param_info(species_params, "Lancetfish", "R_max", round(1e11 * 8273.171^-1.5))
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "R_max", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "StripedMarlin", "R_max", round(1e11 * 92753.66^-1.5))
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "R_max", 
+                                 "default")
+
+species_params <- add_param_info(species_params, "Wahoo", "R_max", round(1e11 * 39906.02^-1.5))
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "R_max", 
+                                 "default")
+```
 
 depth_min
 ```{r}
@@ -534,15 +589,91 @@ species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "sigma"
                                  "@Barnes2008")
 ```
 
+a & b
+```{r}
+# a & b
+# a values are multiplied by 1000 to convert to weights in kg to g
+species_params <- add_param_info(species_params, "Lancetfish", "a", 6.01421e-6 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "a", 
+                                      "@Uchiyama2003")
+species_params <- add_param_info(species_params, "Lancetfish", "b", 2.75849)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "b", 
+                                      "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "BigeyeTuna", "a", 3.5146e-5 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "a", 
+                                      "@Bigelow2012")
+species_params <- add_param_info(species_params, "BigeyeTuna", "b", 2.9096)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "b", 
+                                      "@Bigelow2012")
+
+species_params <- add_param_info(species_params, "MahiMahi", "a", 1.124245e-6 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "a", 
+                                      "@Uchiyama2006")
+species_params <- add_param_info(species_params, "MahiMahi", "b", 3.419622)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "b", 
+                                      "@Uchiyama2006")
+
+# BlueShark: sexually dimorphic L-W conversions
+
+species_params <- add_param_info(species_params, "Swordfish", "a", 1.30e-5 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "a", 
+                                      "@DeMartini2007")
+species_params <- add_param_info(species_params, "Swordfish", "b", 3.07)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "b", 
+                                      "@DeMartini2007")
+
+species_params <- add_param_info(species_params, "YellowfinTuna", "a", 3.17e-5 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "a", 
+                                      "@Uchiyama2003")
+species_params <- add_param_info(species_params, "YellowfinTuna", "b", 2.88938)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "b", 
+                                      "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "SkipjackTuna", "a", 7.65e-6 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "a", 
+                                      "@Uchiyama2033")
+species_params <- add_param_info(species_params, "SkipjackTuna", "b", 3.24281)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "b", 
+                                      "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "AlbacoreTuna", "a", 2.6e-5 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "a", 
+                                      "@Curran2016, @Uchiyama2003")
+species_params <- add_param_info(species_params, "AlbacoreTuna", "b", 2.95)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "b", 
+                                      "@Curran2016, @Uchiyama2003")
+
+species_params <- add_param_info(species_params, "StripedMarlin", "a", 4.68e-6 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "a", 
+                                      "@BillfishWG")
+species_params <- add_param_info(species_params, "StripedMarlin", "b", 3.16)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "b", 
+                                      "@BillfishWG")
+
+species_params <- add_param_info(species_params, "Wahoo", "a", 1.4157e-6 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "a", 
+                                      "@Uchiyama2006")
+species_params <- add_param_info(species_params, "Wahoo", "b", 3.3034)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "b", 
+                                      "@Uchiyama2006")
+
+# Opah: sexually dimorphic L-W conversions
+
+# BlueMarlin: sexually dimorphic L-W conversions
+```
+
 Shortfin Mako Shark
 ```{r}
 species_params <- add_param_info(species_params, "ShortfinMakoShark", "w_min", 2404)
 species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "w_min", 
                                  "@CZ2018")
+# Converted from l_min in TL, but other lengths are PCL
 
 species_params <- add_param_info(species_params, "ShortfinMakoShark", "w_mat", 122503)
 species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "w_mat", 
                                  "@Mako2024a, @Mako2024r")
+# Sexually dimorphic and averaged across male and female after conversion from l_mat
 
 species_params <- add_param_info(species_params, "ShortfinMakoShark", "age_mat", 10)
 species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "age_mat", 
@@ -551,6 +682,7 @@ species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", 
 species_params <- add_param_info(species_params, "ShortfinMakoShark", "w_max", 373993)
 species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "w_max", 
                                  "@Mako2024a, @Mako2024r")
+# Sexually dimorphic and averaged across male and female after conversion from l_mat
 
 species_params <- add_param_info(species_params, "ShortfinMakoShark", "R_max", round(1e11 * 373993^-1.5))
 species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "R_max", 
@@ -571,6 +703,8 @@ species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", 
 species_params <- add_param_info(species_params, "ShortfinMakoShark", "sigma", 3.2)
 species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "sigma", 
                                  "@Barnes2008")
+
+# Sexually dimorphic L-W conversions, plus references us different lenghts (TL and PCL)
 ```
 
 Pomfret
@@ -578,18 +712,21 @@ Pomfret
 species_params <- add_param_info(species_params, "Pomfret", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "Pomfret", "w_min", 
                                  "default")
+# omitting l_min to use default teleost w_min
 
-species_params <- add_param_info(species_params, "Pomfret", "w_mat", 539)
-species_params_refs <- add_param_info(species_params_refs, "Pomfret", "w_mat", 
+species_params <- add_param_info(species_params, "Pomfret", "l_mat", 30)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "l_mat", 
                                  "@Bigelow1995")
+# w_mat converted from l_mat
 
-species_params <- add_param_info(species_params, "Pomfret", "age_mat", 1)
+species_params <- add_param_info(species_params, "Pomfret", "age_mat", 2.5)
 species_params_refs <- add_param_info(species_params_refs, "Pomfret", "age_mat", 
-                                 "@Bigelow1995")
+                                 "ExpertOpinion")
 
 species_params <- add_param_info(species_params, "Pomfret", "w_max", 9000)
 species_params_refs <- add_param_info(species_params_refs, "Pomfret", "w_max", 
                                  "@WPRFMC2005")
+# w_max provided directly by reference
 
 species_params <- add_param_info(species_params, "Pomfret", "R_max", round(1e11 * 9000^-1.5))
 species_params_refs <- add_param_info(species_params_refs, "Pomfret", "w_max", 
@@ -610,6 +747,14 @@ species_params_refs <- add_param_info(species_params_refs, "Pomfret", "beta",
 species_params <- add_param_info(species_params, "Pomfret", "sigma", 4.0)
 species_params_refs <- add_param_info(species_params_refs, "Pomfret", "sigma", 
                                  "@Barnes2008")
+
+species_params <- add_param_info(species_params, "Pomfret", "a", 1.5e-3 * 1000) 
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "a", 
+                                 "@Curran2016")
+
+species_params <- add_param_info(species_params, "Pomfret", "b", 2.03)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "b", 
+                                 "@Curran2016")
 ```
 
 Shortbill spearfish
@@ -617,10 +762,12 @@ Shortbill spearfish
 species_params <- add_param_info(species_params, "ShortbillSpearfish", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "w_min",
                                  "default")
+# l_min omitted to use teleost default w_min
 
-species_params <- add_param_info(species_params, "ShortbillSpearfish", "w_mat", 7719)
-species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "w_mat",
-                                 "@Thorson2023, @Uchiyama2003")
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "l_mat", 120)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "l_mat",
+                                 "@Molony2008")
+# w_mat converted from l_mat
 
 species_params <- add_param_info(species_params, "ShortbillSpearfish", "age_mat", 2)
 species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "age_mat",
@@ -629,6 +776,7 @@ species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish",
 species_params <- add_param_info(species_params, "ShortbillSpearfish", "w_max", 23500)
 species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "w_max",
                                  "@Uchiyama2003")
+# w_max provided directly by reference
 
 species_params <- add_param_info(species_params, "ShortbillSpearfish", "R_max", round(1e11 * 23500^-1.5))
 species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "R_max",
@@ -649,25 +797,36 @@ species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish",
 species_params <- add_param_info(species_params, "ShortbillSpearfish", "sigma", 4.0)
 species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "sigma",
                                  "@Barnes2008")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "a", 1.84456e-4 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "a",
+                                 "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "b", 2.30582)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "b",
+                                 "@Uchiyama2003")
 ```
 
 Oceanic Whitetip Shark
 ```{r}
-species_params <- add_param_info(species_params, "OceanicWhitetipShark", "w_min", 3583)
-species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "w_min",
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "l_min", 70)
+species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "l_min",
                                  "@Seki1998, @Joung2016, @DAlberto2017, @Young2020")
+# w_min converted from l_min
 
-species_params <- add_param_info(species_params, "OceanicWhitetipShark", "w_mat", 68256)
-species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "w_mat",
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "l_mat", 194)
+species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "l_mat",
                                  "@Joung2016, @TremblayBoyer2019")
+# w_mat converted from l_mat
 
-species_params <- add_param_info(species_params, "OceanicWhitetipShark", "age_mat", 8)
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "age_mat", 8.85)
 species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "age_mat",
                                  "@Joung2016, @TremblayBoyer2019")
 
-species_params <- add_param_info(species_params, "OceanicWhitetipShark", "w_max", 303363)
-species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "w_max",
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "l_max", 325)
+species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "l_max",
                                  "@TremblayBoyer2019")
+# w_max converted from l_mat
 
 species_params <- add_param_info(species_params, "OceanicWhitetipShark", "R_max", round(1e11 * 303363^-1.5))
 species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "R_max",
@@ -679,7 +838,7 @@ species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark
 
 species_params <- add_param_info(species_params, "OceanicWhitetipShark", "depth_max", 200)
 species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "depth_max",
-                                 "@Young2020, @TremblayBoyer2019")
+                                 "@/oung2020, @TremblayBoyer2019")
 
 species_params <- add_param_info(species_params, "OceanicWhitetipShark", "beta", 359)
 species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "beta",
@@ -688,6 +847,14 @@ species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark
 species_params <- add_param_info(species_params, "OceanicWhitetipShark", "sigma", 3.2)
 species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "sigma",
                                  "@Barnes2008")
+
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "a", 1.66e-5 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "a",
+                                 "@Joung2016")
+
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "b", 2.891)
+species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "b",
+                                 "@Joung2016")
 ```
 
 Snake Mackerel
@@ -695,10 +862,13 @@ Snake Mackerel
 species_params <- add_param_info(species_params, "SnakeMackerel", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "w_min",
                                  "default")
+# l_min omitted to use teleost default w_min
 
-species_params <- add_param_info(species_params, "SnakeMackerel", "w_mat", 205)
-species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "w_mat",
+species_params <- add_param_info(species_params, "SnakeMackerel", "l_mat", 47)
+species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "l_mat",
                                  "@Thorson2023, FishBase")
+# w_mat calculated from l_mat
+
 
 species_params <- add_param_info(species_params, "SnakeMackerel", "age_mat", 3)
 species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "age_mat",
@@ -707,6 +877,7 @@ species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "age
 species_params <- add_param_info(species_params, "SnakeMackerel", "w_max", 2400)
 species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "w_max",
                                  "@Uchiyama2003")
+# w_max provided directly by reference
 
 species_params <- add_param_info(species_params, "SnakeMackerel", "R_max", round(1e11 * 2400^-1.5))
 species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "R_max",
@@ -727,6 +898,14 @@ species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "bet
 species_params <- add_param_info(species_params, "SnakeMackerel", "sigma", 4.0)
 species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "sigma",
                                  "@Barnes2008")
+
+species_params <- add_param_info(species_params, "SnakeMackerel", "a", 1.19631e-5 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "a",
+                                 "@Uchiyama2003")
+
+species_params <- add_param_info(species_params, "SnakeMackerel", "b", 2.53172)
+species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "b",
+                                 "@Uchiyama2003")
 ```
 
 Escolar
@@ -734,30 +913,33 @@ Escolar
 species_params <- add_param_info(species_params, "Escolar", "w_min", 0.001)
 species_params_refs <- add_param_info(species_params_refs, "Escolar", "w_min",
                                  "default")
+# l_min omitted to use teleost default w_min
 
-species_params <- add_param_info(species_params, "Escolar", "w_mat", 450)
-species_params_refs <- add_param_info(species_params_refs, "Escolar", "w_mat",
-                                 "@Lorenzo1999")
+species_params <- add_param_info(species_params, "Escolar", "l_mat", 102)
+species_params_refs <- add_param_info(species_params_refs, "Escolar", "l_mat",
+                                 "Estimated")
+# w_mat converted from l_mat
 
 species_params <- add_param_info(species_params, "Escolar", "age_mat", 4)
 species_params_refs <- add_param_info(species_params_refs, "Escolar", "age_mat",
-                                 "@Lorenzo1999")
+                                 "@Thorson2023")
 
-species_params <- add_param_info(species_params, "Escolar", "w_max", 3341)
-species_params_refs <- add_param_info(species_params_refs, "Escolar", "w_max",
+species_params <- add_param_info(species_params, "Escolar", "l_max", 140)
+species_params_refs <- add_param_info(species_params_refs, "Escolar", "l_max",
                                  "@Sundberg2011")
+# w_max converted from l_max
 
-species_params <- add_param_info(species_params, "Escolar", "R_max", round(1e11 * 3341^-1.5))
+species_params <- add_param_info(species_params, "Escolar", "R_max", round(1e11 * 32379.2^-1.5))
 species_params_refs <- add_param_info(species_params_refs, "Escolar", "R_max",
                                  "default")
 
-species_params <- add_param_info(species_params, "Escolar", "depth_min", 100)
+species_params <- add_param_info(species_params, "Escolar", "depth_min", 0)
 species_params_refs <- add_param_info(species_params_refs, "Escolar", "depth_min",
-                                 "@Lorenzo1995, @Choy2013")
+                                 "Default")
 
 species_params <- add_param_info(species_params, "Escolar", "depth_max", 800)
 species_params_refs <- add_param_info(species_params_refs, "Escolar", "depth_max",
-                                 "@Lorenzo1995, @Lorenzo1999, @Choy2013")
+                                 "@Choy2013")
 
 species_params <- add_param_info(species_params, "Escolar", "beta", 3646)
 species_params_refs <- add_param_info(species_params_refs, "Escolar", "beta",
@@ -766,7 +948,91 @@ species_params_refs <- add_param_info(species_params_refs, "Escolar", "beta",
 species_params <- add_param_info(species_params, "Escolar", "sigma", 4.0)
 species_params_refs <- add_param_info(species_params_refs, "Escolar", "sigma",
                                  "@Barnes2008")
+
+species_params <- add_param_info(species_params, "Escolar", "a", 1.18e-05 * 1000)
+species_params_refs <- add_param_info(species_params_refs, "Escolar", "a",
+                                 "@Sundberg2011, @Curran2016")
+
+species_params <- add_param_info(species_params, "Escolar", "b", 3.00)
+species_params_refs <- add_param_info(species_params_refs, "Escolar", "b",
+                                 "@Sundberg2011, @Curran2016")
 ```
+
+Catchability
+```{r}
+species_params <- add_param_info(species_params, "Lancetfish", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "Lancetfish", "catchability", 
+                                      "default")
+
+species_params <- add_param_info(species_params, "BigeyeTuna", "catchability", 0.1)
+species_params_refs <- add_param_info(species_params_refs, "BigeyeTuna", "catchability", 
+                                      "@Day2023")
+
+species_params <- add_param_info(species_params, "BlueShark", "catchability", 0.33)
+species_params_refs <- add_param_info(species_params_refs, "BlueShark", "catchability", 
+                                      "@ISC2022")
+
+species_params <- add_param_info(species_params, "MahiMahi", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "MahiMahi", "catchability", 
+                                      "default")
+
+species_params <- add_param_info(species_params, "Swordfish", "catchability", 0.09)
+species_params_refs <- add_param_info(species_params_refs, "Swordfish", "catchability", 
+                                      "@BillfishWG2023")
+
+species_params <- add_param_info(species_params, "YellowfinTuna", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "catchability", 
+                                      "@Magnusson2023, @MinteVera2020")
+
+species_params <- add_param_info(species_params, "SkipjackTuna", "catchability", 0.1)
+species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "catchability", 
+                                      "@Teears2025")
+
+species_params <- add_param_info(species_params, "AlbacoreTuna", "catchability", 0.13)
+species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "catchability", 
+                                      "@AlbacoreWG2023")
+
+species_params <- add_param_info(species_params, "StripedMarlin", "catchability", 0.68)
+species_params_refs <- add_param_info(species_params_refs, "StripedMarlin", "catchability", 
+                                      "@BillfishWG")
+
+species_params <- add_param_info(species_params, "Wahoo", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "Wahoo", "catchability", 
+                                      "default")
+
+species_params <- add_param_info(species_params, "Opah", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "Opah", "catchability", 
+                                      "default")
+
+species_params <- add_param_info(species_params, "BlueMarlin", "catchability", 0.13)
+species_params_refs <- add_param_info(species_params_refs, "BlueMarlin", "catchability", 
+                                      "@BillfishWG2021")
+
+species_params <- add_param_info(species_params, "ShortfinMakoShark", "catchability", 0.018)
+species_params_refs <- add_param_info(species_params_refs, "ShortfinMakoShark", "catchability", 
+                                      "@Mako2024a")
+
+species_params <- add_param_info(species_params, "Pomfret", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "Pomfret", "catchability", 
+                                      "default")
+
+species_params <- add_param_info(species_params, "ShortbillSpearfish", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "ShortbillSpearfish", "catchability", 
+                                      "default")
+
+species_params <- add_param_info(species_params, "OceanicWhitetipShark", "catchability", 0.12)
+species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "catchability", 
+                                      "@Neubauer2025")
+
+species_params <- add_param_info(species_params, "SnakeMackerel", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "catchability", 
+                                      "default")
+
+species_params <- add_param_info(species_params, "Escolar", "catchability", 0.2)
+species_params_refs <- add_param_info(species_params_refs, "Escolar", "catchability", 
+                                      "default")
+```
+
 
 Species
 ```{r}
