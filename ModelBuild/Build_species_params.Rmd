@@ -273,10 +273,10 @@ species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "age_
 #AlbacoreTuna: w_mat calculated from l_mat
 species_params <- add_param_info(species_params, "AlbacoreTuna", "l_mat", 89)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "l_mat", 
-                                      "@AlbacoreWG")
+                                      "@AlbacoreWG2023")
 species_params <- add_param_info(species_params, "AlbacoreTuna", "age_mat", 5)
 species_params_refs <- add_param_info(species_params_refs, "AlbacoreTuna", "age_mat", 
-                                 "@AlbacoreWG")
+                                 "@AlbacoreWG2023")
 
 # StripedMarlin: w_mat calculated from l_mat
 species_params <- add_param_info(species_params, "StripedMarlin", "l_mat", 165.7)
@@ -632,7 +632,7 @@ species_params_refs <- add_param_info(species_params_refs, "YellowfinTuna", "b",
 
 species_params <- add_param_info(species_params, "SkipjackTuna", "a", 7.65e-6 * 1000)
 species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "a", 
-                                      "@Uchiyama2033")
+                                      "@Uchiyama2003")
 species_params <- add_param_info(species_params, "SkipjackTuna", "b", 3.24281)
 species_params_refs <- add_param_info(species_params_refs, "SkipjackTuna", "b", 
                                       "@Uchiyama2003")
@@ -889,7 +889,7 @@ species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "dep
 
 species_params <- add_param_info(species_params, "SnakeMackerel", "depth_max", 400)
 species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "depth_max",
-                                 "@Oyafuso2013, @Choy2013")
+                                 "@Oyafuso2016, @Choy2013")
 
 species_params <- add_param_info(species_params, "SnakeMackerel", "beta", 3646)
 species_params_refs <- add_param_info(species_params_refs, "SnakeMackerel", "beta",
@@ -1080,6 +1080,7 @@ to the repo.  Otherwise, they'll only live on your computer.
 ```{r}
 # Save the parameters
 write_csv(species_params, file = here("Pelagic_params.csv"))
+write_csv(species_params_refs, file = here("Pelagic_params_refs.csv"))
 ```
 
 
