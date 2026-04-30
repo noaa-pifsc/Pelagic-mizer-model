@@ -1,0 +1,837 @@
+---
+title: "CatchSpectra"
+output: html_document
+---
+
+# Purpose
+The purpose of this script is to separate observed trips into deep- and 
+shallow-set trips and create size spectra for the 18 species in our mizer model.
+
+There are a few steps to this.  On the mizer side, we need to load our fledgling 
+model parameters into mizer to get the consumer size classes.  These are the 
+classes we're going to bin the observed catch into.  On the observer data side,
+we need to separate out the trips and then the species (or you could do species
+and then trips—either way works).  Then, we'll bin them and create size spectra.
+
+# Set up the environment
+Let's load some packages that we're going to need for what we're doing.
+```{r}
+library(tidyverse, quietly = TRUE) # handy for working with data
+library(here) # OS agnostic file management
+library(mizer) # For creating the size classes we need
+```
+
+# Mizer info
+We're going to load our parameters, create a multispecies mizer model with them,
+and then keep just the bin sizes and bin widths, species names, and species 
+parameters (because we need the *a* and *b* values for L-W conversions).  
+ 
+For more on `w` and `dw`, see <https://sizespectrum.org/mizer/articles/model_description.html>,
+specifically Size Spectrum Dynamics > Consumer densities > Details.
+
+```{r}
+# Load species parameters and interaction matrix
+pelagic_species_params <- read_csv(here("Pelagic_params.csv"), show_col_types = FALSE)
+pelagic_interaction <- read.csv(here("Pelagic_interaction.csv"), row.names = 1)
+
+# Create multispecies model
+pelagic_params <- newMultispeciesParams(species_params = pelagic_species_params,
+                                       interaction = pelagic_interaction,
+                                       initial_effort = 0,
+                                       n = 0.75, p = 0.75)
+
+# Access the consumer size classes (w) and bin widths (dw) 
+w <- pelagic_params@w
+dw <- pelagic_params@dw
+
+# We're going to turn these into data frames so that we can write them as csvs for 
+# future use.  
+write_csv(data.frame(w), "mizer_w.csv", col_names = FALSE)
+write_csv(data.frame(dw), "mizer_dw.csv", col_names = FALSE)
+
+# Isolate the species names, too, to make things easier later on
+sp <- pelagic_params@species_params$species
+
+# Clean up
+rm(list = setdiff(ls(), c("w", "dw", "sp", "pelagic_species_params")))
+```
+ 
+# Observer info
+Now we can load the observer info and work with it.  
+```{r}
+ObsCatch <- readRDS("ObsCatch_Details_HIonly.rds")
+```
+
+Beginning with trip 2060, observers have measured every third fish.  Step one is
+to filter to those trips and clean up.
+```{r}
+# Strip off the "LL" that starts all the trip numbers and turn the remainder into
+# numbers
+ObsCatch$TRIP_NUM <- as.numeric(str_sub(ObsCatch$TRIP_NUM, 3, 6))
+
+# Filter to trip 2060+
+ObsCatch <- ObsCatch |>
+  filter(TRIP_NUM >= 2060)
+
+# Filter out 2025 (likely a partial year given the time of download)
+ObsCatch <- ObsCatch |>
+  filter(year(HAUL_BEGIN_DATETIME) < 2025)
+
+# We can also remove the EXPR_TRIP_TYPE_ID column because we already filtered it
+# to be NA-only in ObserverCombine.Rmd
+ObsCatch <- ObsCatch |>
+  mutate(EXPR_TRIP_TYPE_ID = NULL)
+
+# And we want to turn the species codes into numbers
+ObsCatch <- ObsCatch |>
+  mutate_at(c('SPECIES_CODE'), as.numeric)
+```
+
+Separate deep and shallow sets.  Clean up.
+```{r}
+ObsDeep <- ObsCatch |>
+  filter(HKS_PER_FLT >= 15)
+
+ObsShal <- ObsCatch |>
+  filter(HKS_PER_FLT < 15)
+
+# Note that all rows are accounted for:
+# dim(ObsCatch)[1] - (dim(ObsDeep)[1] + dim(ObsShal)[1]) is equal in size to
+# test <- which(is.na(ObsCatch$HKS_PER_FLT))
+
+rm(ObsCatch)
+```
+
+Now we need to separate by species.  This part is tedious.  If there's a better 
+way to do it, I would love the tip.  Please create an issue or a pull request.
+Our end goal is two 18x100 data frames that have a row for each species and a 
+column for each size bin.  The values are the approximate counts at size.  There
+are a bunch of intermediate steps to get here, which is the tedious part.  But, 
+the end result should be pretty useful and save us time down the road.
+```{r}
+# Build empty matrices
+DeepN <- matrix(NA, 
+                nrow = length(sp), ncol = length(w),
+                dimnames = list(species = sp, w = w))
+ShalN <- matrix(NA, 
+                nrow = length(sp), ncol = length(w),
+                dimnames = list(species = sp, w = w))
+
+# And keep track of how many measurements there are for each fish
+DeepN_n <- matrix(NA, 
+                  nrow = length(sp), ncol = 1,
+                  dimnames = list(species = sp, n = "count"))
+ShalN_n <- matrix(NA, 
+                  nrow = length(sp), ncol = 1,
+                  dimnames = list(species = sp, n = "count"))
+
+# Loop through each species/row
+# Filter deep and shallow to said species
+# Convert length to weight
+# Loop through each size bin, summing obs in that size
+# Note: we'd need to divide counts by dw to match mizer N or
+# multiply mizer N by dw to get this (we're going to do the latter)
+for (r in seq(1, length(sp), 1)) {
+  if (sp[r] == "Lancetfish") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 122 | SPECIES_CODE == 121) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 500) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 122 | SPECIES_CODE == 121) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 500) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "BigeyeTuna") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 211) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 211) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "BlueShark") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 418) |> 
+      filter(MEAS1_TYPE_ID == 4415) |> # in-protocol approximate length in ft
+      filter(!is.na(MEAS1) & MEAS1 < 17) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # ft to cm (note that this will make a blocky weight distribution)
+    # 1 ft = 30.48 cm
+    ObsDeep_hold$MEAS1 <- ObsDeep_hold$MEAS1 * 30.48
+    # Convert estimated TL to estimated PCL
+    # PCL = (TL × 0.748) + 1.063
+    ObsDeep_hold$MEAS1 <- (ObsDeep_hold$MEAS1 * 0.748) + 1.063
+    # Average across males and females, in g rather than kg
+    Deep_m <- (3.291e-6 * 1000) * ObsDeep_hold$MEAS1^3.225
+    Deep_f <- (5.388e-6 * 1000) * ObsDeep_hold$MEAS1^3.102
+    Deep_w <- (Deep_m + Deep_f)/2
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 418) |> 
+      filter(MEAS1_TYPE_ID == 4415) |> # in-protocol approximate length in ft
+      filter(!is.na(MEAS1) & MEAS1 < 17) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # ft to cm (note that this will make a blocky weight distribution)
+    # 1 ft = 30.48 cm
+    ObsShal_hold$MEAS1 <- ObsShal_hold$MEAS1 * 30.48
+    # Convert estimated TL to estimated PCL
+    # PCL = (TL × 0.748) + 1.063
+    ObsShal_hold$MEAS1 <- (ObsShal_hold$MEAS1 * 0.748) + 1.063
+    # Average across males and females, in g rather than kg
+    Shal_m <- (3.291e-6 * 1000) * ObsShal_hold$MEAS1^3.225
+    Shal_f <- (5.388e-6 * 1000) * ObsShal_hold$MEAS1^3.102
+    Shal_w <- (Shal_m + Shal_f)/2
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "MahiMahi") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 218 | SPECIES_CODE == 219) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 500) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # Average across males and females, in g rather than kg
+    Deep_m <- (8.09e-6 * 1000) * ObsDeep_hold$MEAS1^3.0157
+    Deep_f <- (1.07e-5 * 1000) * ObsDeep_hold$MEAS1^2.9337
+    Deep_w <- (Deep_m + Deep_f)/2
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 218 | SPECIES_CODE == 219) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 500) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # Average across males and females, in g rather than kg
+    Shal_m <- (8.09e-6 * 1000) * ObsShal_hold$MEAS1^3.0157
+    Shal_f <- (1.07e-5 * 1000) * ObsShal_hold$MEAS1^2.9337
+    Shal_w <- (Shal_m + Shal_f)/2
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "Swordfish") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 301) |> 
+      filter(MEAS1_TYPE_ID == 1350) |> # in-protocol EFL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 301) |> 
+      filter(MEAS1_TYPE_ID == 1350) |> # in-protocol EFL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "YellowfinTuna") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 216) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 216) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "SkipjackTuna") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 212) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 212) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "AlbacoreTuna") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 215) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 215) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "StripedMarlin") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 302) |> 
+      filter(MEAS1_TYPE_ID == 1350) |> # in-protocol EFL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 500) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 302) |> 
+      filter(MEAS1_TYPE_ID == 1350) |> # in-protocol EFL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 500) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "Wahoo") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 221) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 221) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "Opah") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 144) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # Average across male, female, and unknown using weight in g not kg
+    Deep_m <- exp(2.5692 * log(ObsDeep_hold$MEAS1) - 8.2368) * 1000
+    Deep_f <- exp(2.5815 * log(ObsDeep_hold$MEAS1) - 8.3378) * 1000
+    Deep_u <- exp(2.7332 * log(ObsDeep_hold$MEAS1) - 9.084) * 1000
+    Deep_w <- (Deep_m + Deep_f + Deep_u) / 3
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 144) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # Average across male, female, and unknown using weight in g not kg
+    Shal_m <- exp(2.5692 * log(ObsShal_hold$MEAS1) - 8.2368) * 1000
+    Shal_f <- exp(2.5815 * log(ObsShal_hold$MEAS1) - 8.3378) * 1000
+    Shal_u <- exp(2.7332 * log(ObsShal_hold$MEAS1) - 9.084) * 1000
+    Shal_w <- (Shal_m + Shal_f + Shal_u) / 3
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "BlueMarlin") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 305) |> 
+      filter(MEAS1_TYPE_ID == 1350) |> # in-protocol EFL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 350) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # Average across male, female, and unknown using weight in g not kg
+    Deep_m <- (1.37e-5 * 1000) * ObsDeep_hold$MEAS1^2.975
+    Deep_f <- (1.84e-5 * 1000) * ObsDeep_hold$MEAS1^2.956
+    Deep_w <- (Deep_m + Deep_f) / 2
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 305) |> 
+      filter(MEAS1_TYPE_ID == 1350) |> # in-protocol EFL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 350) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # Average across male, female, and unknown using weight in g not kg
+    Shal_m <- (1.37e-5 * 1000) * ObsShal_hold$MEAS1^2.975
+    Shal_f <- (1.84e-5 * 1000) * ObsShal_hold$MEAS1^2.956
+    Shal_w <- (Shal_m + Shal_f) / 2
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "ShortfinMakoShark") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 432) |> 
+      filter(MEAS1_TYPE_ID == 4415) |> # in-protocol approximate length in ft
+      filter(!is.na(MEAS1) & MEAS1 < 14) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # ft to cm (note that this will make a blocky weight distribution)
+    # 1 ft = 30.48 cm
+    ObsDeep_hold$MEAS1 <- ObsDeep_hold$MEAS1 * 30.48
+    # Convert estimated TL to estimated PCL
+    # PCL = (TL × 0.816) + 0.784
+    ObsDeep_hold$MEAS1 <- (ObsDeep_hold$MEAS1 * 0.816) + 0.784
+    # Average across males and females, in g rather than kg
+    Deep_m <- (4.62e-5 * 1000) * ObsDeep_hold$MEAS1^2.77
+    Deep_f <- (3.40e-5 * 1000) * ObsDeep_hold$MEAS1^2.84
+    Deep_w <- (Deep_m + Deep_f)/2
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 432) |> 
+      filter(MEAS1_TYPE_ID == 4415) |> # in-protocol approximate length in ft
+      filter(!is.na(MEAS1) & MEAS1 < 14) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # ft to cm (note that this will make a blocky weight distribution)
+    # 1 ft = 30.48 cm
+    ObsShal_hold$MEAS1 <- ObsShal_hold$MEAS1 * 30.48
+    # Convert estimated TL to estimated PCL
+    # PCL = (TL × 0.816) + 0.784
+    ObsShal_hold$MEAS1 <- (ObsShal_hold$MEAS1 * 0.816) + 0.784
+    # Average across males and females, in g rather than kg
+    Shal_m <- (4.62e-5 * 1000) * ObsShal_hold$MEAS1^2.77
+    Shal_f <- (3.40e-5 * 1000) * ObsShal_hold$MEAS1^2.84
+    Shal_w <- (Shal_m + Shal_f)/2
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "Pomfret") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 189 | SPECIES_CODE == 188 | SPECIES_CODE == 187 | 
+               SPECIES_CODE == 185 | SPECIES_CODE == 183 | SPECIES_CODE == 184 | 
+               SPECIES_CODE == 186 | SPECIES_CODE == 180) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 189 | SPECIES_CODE == 188 | SPECIES_CODE == 187 | 
+               SPECIES_CODE == 185 | SPECIES_CODE == 183 | SPECIES_CODE == 184 | 
+               SPECIES_CODE == 186 | SPECIES_CODE == 180) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "ShortbillSpearfish") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 303) |> 
+      filter(MEAS1_TYPE_ID == 1350) |> # in-protocol EFL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 303) |> 
+      filter(MEAS1_TYPE_ID == 1350) |> # in-protocol EFL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "OceanicWhitetipShark") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 419) |> 
+      filter(MEAS1_TYPE_ID == 4415) |> # in-protocol approximate length in ft
+      filter(!is.na(MEAS1)) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # ft to cm (note that this will make a blocky weight distribution)
+    # 1 ft = 30.48 cm
+    ObsDeep_hold$MEAS1 <- ObsDeep_hold$MEAS1 * 30.48
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 419) |> 
+      filter(MEAS1_TYPE_ID == 4415) |> # in-protocol approximate length in ft
+      filter(!is.na(MEAS1)) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    # ft to cm (note that this will make a blocky weight distribution)
+    # 1 ft = 30.48 cm
+    ObsShal_hold$MEAS1 <- ObsShal_hold$MEAS1 * 30.48
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "SnakeMackerel") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 193) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 193) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1)) |> # omit missing values 
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+  
+  if (sp[r] == "Escolar") {
+    ObsDeep_hold <- ObsDeep |>
+      filter(SPECIES_CODE == 191 | SPECIES_CODE == 192 | SPECIES_CODE == 197 | 
+               SPECIES_CODE == 196) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 500) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Deep_w <- pelagic_species_params$a[r] * ObsDeep_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    d <- hist(Deep_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    DeepN[r,] <- d$counts
+    DeepN_n[r,1] <- length(Deep_w)
+    
+    ObsShal_hold <- ObsShal |>
+      filter(SPECIES_CODE == 191 | SPECIES_CODE == 192 | SPECIES_CODE == 197 | 
+               SPECIES_CODE == 196) |> 
+      filter(MEAS1_TYPE_ID == 1348) |> # in-protocol FL to the nearest cm
+      filter(!is.na(MEAS1) & MEAS1 < 500) |> # omit missing values and outliers
+      select(MEAS1) # Just keep the lengths
+    # Convert L to W
+    Shal_w <- pelagic_species_params$a[r] * ObsShal_hold$MEAS1^pelagic_species_params$b[r]
+    # Bin
+    s <- hist(Shal_w, breaks = c(w, (w[100] + dw[100])), plot = FALSE)
+    # Fill matrices
+    ShalN[r,] <- s$counts
+    ShalN_n[r,1] <- length(Shal_w)
+  }
+}
+
+# Clean up
+rm(d, s, r, ObsDeep_hold, ObsShal_hold, 
+   Deep_f, Deep_m, Deep_w, 
+   Shal_f, Shal_m, Shal_w)
+```
+
+Identify species-specific fishing parameters: sigmoidal weight and sigmoidal
+sigma. For more on fishing in mizer see <https://sizespectrum.org/mizer/reference/gear_params.html>
+and <https://sizespectrum.org/mizer/reference/sigmoid_weight.html>.
+```{r}
+# Set sigmoidal_weight as the smallest size with at least 25% of max catch
+# Set sigmoidal_sigmal as the width of sizes caught
+# Doing this as simply as possible to start, to see how it works.
+pelagic_deep_params <- data.frame(
+  species  = sp,
+  gear = rep("DeepSet", length(sp)),
+  catchability = pelagic_species_params$catchability,
+  sel_func = rep("sigmoid_weight", length(sp)),
+  sigmoidal_weight = rep(NA, length(sp)), # We're going to loop through and fill this
+  sigmoidal_sigma =  rep(NA, length(sp)) # We're going to loop through and fill this
+)
+
+pelagic_shallow_params <- data.frame(
+  species  = sp,
+  gear = rep("ShallowSet", length(sp)),
+  catchability = pelagic_species_params$catchability,
+  sel_func = rep("sigmoid_weight", length(sp)),
+  sigmoidal_weight = rep(NA, length(sp)), # We're going to loop through and fill this
+  sigmoidal_sigma =  rep(NA, length(sp)) # We're going to loop through and fill this
+)
+
+for (s in seq(1, length(sp), 1)) {
+  # Find the index for the maximum weight
+  d_max <- which(DeepN[s,] >= (max(DeepN[s,]) * 0.25))
+  s_max <- which(ShalN[s,] >= (max(ShalN[s,]) * 0.25))
+  
+  # Put the corresponding size in the params data frame
+  pelagic_deep_params$sigmoidal_weight[s] <- w[min(d_max)]
+  pelagic_shallow_params$sigmoidal_weight[s] <- w[min(s_max)]
+  
+  # Find sizes that have at least 1% of the catch of max catch size
+  d_nz <- which(DeepN[s,] >= (max(DeepN[s,]) * 0.01))
+  s_nz <- which(ShalN[s,] >= (max(ShalN[s,]) * 0.01))
+  
+  # Put the inclusive range in the params data frame
+  pelagic_deep_params$sigmoidal_sigma[s] <- (max(d_nz) - min(d_nz) + 1)
+  pelagic_shallow_params$sigmoidal_sigma[s] <- (max(s_nz) - min(s_nz) + 1)
+}
+
+# Clean up
+rm(s, d_max, s_max, d_nz, s_nz)
+
+# Combine, for saving
+pelagic_gear_params <- rbind(pelagic_deep_params, pelagic_shallow_params)
+```
+
+
+Plot things
+```{r}
+# pdf(here("ModelBuild", "FisheryData", "DeepSet_SizeStructure.pdf"))
+par(mfrow = c(3,6))
+for (s in seq(1, 18, 1)) {
+  plot(log10(w), DeepN[s,], type = "l", xlim = c(-3, 6), main = sp[s],
+       xlab = "log10(body weight in grams)", ylab = "Number Caught")
+  points(log10(pelagic_deep_params$sigmoidal_weight[s]), max(DeepN[s,]*0.25), 
+         col = "deepskyblue", xlim = c(-3, 6))
+  lines(x = c(min(log10(w[which(DeepN[s,] >= (max(DeepN[s,]) * 0.01))])), max(log10(w[which(DeepN[s,] >= (max(DeepN[s,]) * 0.01))]))),
+        y = c(0.01*max(DeepN[s,]), 0.01*max(DeepN[s,])),
+        col = "deepskyblue", xlim = c(-3,6), yaxt = "n")
+  text(-2, 0.8*max(DeepN[s,]), paste0("n = ", DeepN_n[s,1]))
+}
+# dev.off()
+
+# pdf(here("ModelBuild", "FisheryData", "ShallowSet_SizeStructure.pdf"))
+par(mfrow = c(3,6))
+for (s in seq(1, 18, 1)) {
+  plot(log10(w), ShalN[s,], type = "l", xlim = c(-3, 6), main = sp[s],
+       xlab = "log10(body weight in grams)", ylab = "Number Caught")
+  points(log10(pelagic_shallow_params$sigmoidal_weight[s]), max(ShalN[s,]*0.25), 
+         col = "deepskyblue", xlim = c(-3, 6))
+  lines(x = c(min(log10(w[which(ShalN[s,] >= (max(ShalN[s,]) * 0.01))])), max(log10(w[which(ShalN[s,] >= (max(ShalN[s,]) * 0.01))]))),
+        y = c(0.01*max(ShalN[s,]), 0.01*max(ShalN[s,])),
+        col = "deepskyblue", xlim = c(-3,6), yaxt = "n")
+  text(-2, 0.8*max(ShalN[s,]), paste0("n = ", ShalN_n[s,1]))
+}
+# dev.off()
+```
+Note: The shark distributions are blocky because their lengths are measured in 
+feet instead of in cm.  
+
+We need to add row names to the gear parameters, by pasting together the species
+name and the gear name, separating them by a comma.
+```{r}
+gear_row_names <- paste(pelagic_gear_params$species, pelagic_gear_params$gear, sep = ", ")
+row.names(pelagic_gear_params) <- gear_row_names
+```
+
+Save things
+```{r}
+# write_csv(as.data.frame(DeepN), here("ModelBuild", "FisheryData", "DeepSet_CatchAtSize.csv"))
+# write_csv(as.data.frame(ShalN), here("ModelBuild", "FisheryData", "ShallowSet_CatchAtSize.csv"))
+# 
+# write_csv(as.data.frame(DeepN_n), here("ModelBuild", "FisheryData", "DeepSet_CatchCounts.csv"))
+# write_csv(as.data.frame(ShalN_n), here("ModelBuild", "FisheryData", "ShallowSet_CatchCounts.csv"))
+# 
+# write.csv(pelagic_gear_params, here("Pelagic_gear_params_25_1.csv"), row.names = TRUE)
+```
+
+Figure for model overview (to be refined in Illustrator)
+```{r}
+s <- 2
+# pdf(here("ModelBuild", "FisheryData", "BigeyeExample.pdf"), width = 6, height = 4)
+par(mfrow = c(1,1))
+plot(log10(w), DeepN[s,], type = "l", xlim = c(-3, 6), main = sp[s],
+     xlab = "log10(body weight in grams)", ylab = "Number Caught", yaxt = "n")
+points(log10(pelagic_deep_params$sigmoidal_weight[s]), max(DeepN[s,]*0.25), 
+       col = "#008da8", xlim = c(-3, 6), yaxt = "n")
+lines(x = c(min(log10(w[which(DeepN[s,] >= (max(DeepN[s,]) * 0.01))])), max(log10(w[which(DeepN[s,] >= (max(DeepN[s,]) * 0.01))]))),
+      y = c(0.01*max(DeepN[s,]), 0.01*max(DeepN[s,])),
+      col = "#008da8", xlim = c(-3,6), yaxt = "n")
+text(-2, 0.8*max(DeepN[s,]), paste0("n = ", DeepN_n[s,1]), yaxt = "n")
+axis((2), las = 1)
+# dev.off()
+```
+
+
+
+
+
