@@ -1,0 +1,252 @@
+---
+title: "CatchComparison"
+author: "phoebe.woodworth-jefcoats@noaa.gov"
+---
+
+# Purpose
+The purpose of this script is to compare the observed and modeled catch spectra.
+It started out just looking at a single model run, and then grew to include a 
+bunch of runs for comparison.
+
+# Prep
+Prepare the environment by loading packages and data.  
+```{r}
+library(mizer) # the model
+library(tidyverse, quietly = TRUE) # for working with data 
+library(here) # file path management that's agnostic about your operating system
+```
+
+```{r}
+pelagic_species_params <- read_csv(here("Pelagic_params.csv"), show_col_types = FALSE)
+pelagic_interaction <- read.csv(here("Pelagic_interaction.csv"), row.names = 1)
+pelagic_gear_params <- read.csv(here("Pelagic_gear_params_25_1.csv"), row.names = 1)
+
+ObsDeep <- read_csv(here("ModelBuild", "FisheryData", "DeepSet_CatchAtSize.csv"), show_col_types = FALSE)
+ObsShal <- read_csv(here("ModelBuild", "FisheryData", "ShallowSet_CatchAtSize.csv"), show_col_types = FALSE)
+
+ModDeep_25_1 <- read_csv(here("ModelBuild", "FisheryData", "DeepSet_CatchAtSize_steady_25_1.csv"), show_col_types = FALSE)
+ModDeep_25_5 <- read_csv(here("ModelBuild", "FisheryData", "DeepSet_CatchAtSize_steady_25_5.csv"), show_col_types = FALSE)
+ModDeep_35_1 <- read_csv(here("ModelBuild", "FisheryData", "DeepSet_CatchAtSize_steady_35_1.csv"), show_col_types = FALSE)
+ModDeep_35_5 <- read_csv(here("ModelBuild", "FisheryData", "DeepSet_CatchAtSize_steady_35_5.csv"), show_col_types = FALSE)
+ModDeep_50_1 <- read_csv(here("ModelBuild", "FisheryData", "DeepSet_CatchAtSize_steady_50_1.csv"), show_col_types = FALSE)
+ModDeep_50_5 <- read_csv(here("ModelBuild", "FisheryData", "DeepSet_CatchAtSize_steady_50_5.csv"), show_col_types = FALSE)
+ModShal_25_1 <- read_csv(here("ModelBuild", "FisheryData", "ShallowSet_CatchAtSize_steady_25_1.csv"), show_col_types = FALSE)
+ModShal_25_5 <- read_csv(here("ModelBuild", "FisheryData", "ShallowSet_CatchAtSize_steady_25_5.csv"), show_col_types = FALSE)
+ModShal_35_1 <- read_csv(here("ModelBuild", "FisheryData", "ShallowSet_CatchAtSize_steady_35_1.csv"), show_col_types = FALSE)
+ModShal_35_5 <- read_csv(here("ModelBuild", "FisheryData", "ShallowSet_CatchAtSize_steady_35_5.csv"), show_col_types = FALSE)
+ModShal_50_1 <- read_csv(here("ModelBuild", "FisheryData", "ShallowSet_CatchAtSize_steady_50_1.csv"), show_col_types = FALSE)
+ModShal_50_5 <- read_csv(here("ModelBuild", "FisheryData", "ShallowSet_CatchAtSize_steady_50_5.csv"), show_col_types = FALSE)
+```
+
+We added `catchability` to the species params because it made it easier to track
+the references we used and allowed us to easily add them to the gear params. We're
+going to remove that column now, just to avoid any possible confusion down the
+line.
+```{r}
+pelagic_species_params <- pelagic_species_params |>
+  mutate(catchability = NULL)
+```
+
+We're going to set up the mizer parameters so that it's easier to plot things.
+```{r}
+# Set effort
+effort <- c(DeepSet = 0.985, ShallowSet = 0.015)
+pelagic_params <- newMultispeciesParams(species_params = pelagic_species_params,
+                                        gear_params = pelagic_gear_params,
+                                        interaction = pelagic_interaction,
+                                        initial_effort = effort,
+                                        n = 0.75, p = 0.75,
+                                        w_pp_cutoff = 455400)
+```
+
+Simplify some things:
+```{r}
+# Access the consumer size classes (w) and bin widths (dw) 
+w <- pelagic_params@w
+dw <- pelagic_params@dw
+
+# Isolate the species names, too, to make things easier later on
+sp <- pelagic_params@species_params$species
+```
+
+
+Remember, for the deep set, only ~20% of sets are observed and only every third
+fish is measured.  So we need to multiply abundance by 0.066.
+For the shallow set, every set is observerd and only every third fish is measured.
+So we need to multiply abundance by 0.33.
+
+Look at the correlations.
+```{r}
+r_Vals_25_1 <- matrix(numeric(), nrow = 18, ncol = 2)
+r_Vals_25_5 <- matrix(numeric(), nrow = 18, ncol = 2)
+r_Vals_35_1 <- matrix(numeric(), nrow = 18, ncol = 2)
+r_Vals_35_5 <- matrix(numeric(), nrow = 18, ncol = 2)
+r_Vals_50_1 <- matrix(numeric(), nrow = 18, ncol = 2)
+r_Vals_50_5 <- matrix(numeric(), nrow = 18, ncol = 2)
+p_Vals_25_1 <- matrix(numeric(), nrow = 18, ncol = 2)
+p_Vals_25_5 <- matrix(numeric(), nrow = 18, ncol = 2)
+p_Vals_35_1 <- matrix(numeric(), nrow = 18, ncol = 2)
+p_Vals_35_5 <- matrix(numeric(), nrow = 18, ncol = 2)
+p_Vals_50_1 <- matrix(numeric(), nrow = 18, ncol = 2)
+p_Vals_50_5 <- matrix(numeric(), nrow = 18, ncol = 2)
+rownames(r_Vals_25_1) <- sp
+rownames(r_Vals_25_5) <- sp
+rownames(r_Vals_35_1) <- sp
+rownames(r_Vals_35_5) <- sp
+rownames(r_Vals_50_1) <- sp
+rownames(r_Vals_50_5) <- sp
+rownames(p_Vals_25_1) <- sp
+rownames(p_Vals_25_5) <- sp
+rownames(p_Vals_35_1) <- sp
+rownames(p_Vals_35_5) <- sp
+rownames(p_Vals_50_1) <- sp
+rownames(p_Vals_50_5) <- sp
+colnames(r_Vals_25_1) <- c("Deep", "Shallow")
+colnames(r_Vals_25_5) <- c("Deep", "Shallow")
+colnames(r_Vals_35_1) <- c("Deep", "Shallow")
+colnames(r_Vals_35_5) <- c("Deep", "Shallow")
+colnames(r_Vals_50_1) <- c("Deep", "Shallow")
+colnames(r_Vals_50_5) <- c("Deep", "Shallow")
+colnames(p_Vals_25_1) <- c("Deep", "Shallow")
+colnames(p_Vals_25_5) <- c("Deep", "Shallow")
+colnames(p_Vals_35_1) <- c("Deep", "Shallow")
+colnames(p_Vals_35_5) <- c("Deep", "Shallow")
+colnames(p_Vals_50_1) <- c("Deep", "Shallow")
+colnames(p_Vals_50_5) <- c("Deep", "Shallow")
+
+for (s in seq(1, 18, 1)){
+  deep_hold_25_1 <- cor.test(as.numeric(ObsDeep[s,]), (as.numeric(ModDeep_25_1[s,])*0.066))
+  deep_hold_25_5 <- cor.test(as.numeric(ObsDeep[s,]), (as.numeric(ModDeep_25_5[s,])*0.066))
+  deep_hold_35_1 <- cor.test(as.numeric(ObsDeep[s,]), (as.numeric(ModDeep_35_1[s,])*0.066))
+  deep_hold_35_5 <- cor.test(as.numeric(ObsDeep[s,]), (as.numeric(ModDeep_35_5[s,])*0.066))
+  deep_hold_50_1 <- cor.test(as.numeric(ObsDeep[s,]), (as.numeric(ModDeep_50_1[s,])*0.066))
+  deep_hold_50_5 <- cor.test(as.numeric(ObsDeep[s,]), (as.numeric(ModDeep_50_5[s,])*0.066))
+  shal_hold_25_1 <- cor.test(as.numeric(ObsShal[s,]), (as.numeric(ModShal_25_1[s,])*0.33))
+  shal_hold_25_5 <- cor.test(as.numeric(ObsShal[s,]), (as.numeric(ModShal_25_5[s,])*0.33))
+  shal_hold_35_1 <- cor.test(as.numeric(ObsShal[s,]), (as.numeric(ModShal_35_1[s,])*0.33))
+  shal_hold_35_5 <- cor.test(as.numeric(ObsShal[s,]), (as.numeric(ModShal_35_5[s,])*0.33))
+  shal_hold_50_1 <- cor.test(as.numeric(ObsShal[s,]), (as.numeric(ModShal_50_1[s,])*0.33))
+  shal_hold_50_5 <- cor.test(as.numeric(ObsShal[s,]), (as.numeric(ModShal_50_5[s,])*0.33))
+  
+  if (deep_hold_25_1$p.value < 0.05) {
+    r_Vals_25_1[s,1] <- deep_hold_25_1$estimate
+    p_Vals_25_1[s,1] <- deep_hold_25_1$p.value
+  }
+  if (deep_hold_25_5$p.value < 0.05) {
+    r_Vals_25_5[s,1] <- deep_hold_25_5$estimate
+    p_Vals_25_5[s,1] <- deep_hold_25_5$p.value
+  }
+  if (deep_hold_35_1$p.value < 0.05) {
+    r_Vals_35_1[s,1] <- deep_hold_35_1$estimate
+    p_Vals_35_1[s,1] <- deep_hold_35_1$p.value
+  }
+  if (deep_hold_35_5$p.value < 0.05) {
+    r_Vals_35_5[s,1] <- deep_hold_35_5$estimate
+    p_Vals_35_5[s,1] <- deep_hold_35_5$p.value
+  }
+  if (deep_hold_50_1$p.value < 0.05) {
+    r_Vals_50_1[s,1] <- deep_hold_50_1$estimate
+    p_Vals_50_1[s,1] <- deep_hold_50_1$p.value
+  }
+  if (deep_hold_50_5$p.value < 0.05) {
+    r_Vals_50_5[s,1] <- deep_hold_50_5$estimate
+    p_Vals_50_5[s,1] <- deep_hold_50_5$p.value
+  }
+  
+  if (shal_hold_25_1$p.value < 0.05) {
+    r_Vals_25_1[s,2] <- shal_hold_25_1$estimate
+    p_Vals_25_1[s,2] <- shal_hold_25_1$p.value
+  }
+  if (shal_hold_25_5$p.value < 0.05) {
+    r_Vals_25_5[s,2] <- shal_hold_25_5$estimate
+    p_Vals_25_5[s,2] <- shal_hold_25_5$p.value
+  }
+  if (shal_hold_35_1$p.value < 0.05) {
+    r_Vals_35_1[s,2] <- shal_hold_35_1$estimate
+    p_Vals_35_1[s,2] <- shal_hold_35_1$p.value
+  }
+  if (shal_hold_35_5$p.value < 0.05) {
+    r_Vals_35_5[s,2] <- shal_hold_35_5$estimate
+    p_Vals_35_5[s,2] <- shal_hold_35_5$p.value
+  }
+  if (shal_hold_50_1$p.value < 0.05) {
+    r_Vals_50_1[s,2] <- shal_hold_50_1$estimate
+    p_Vals_50_1[s,2] <- shal_hold_50_1$p.value
+  }
+  if (shal_hold_50_5$p.value < 0.05) {
+    r_Vals_50_5[s,2] <- shal_hold_50_5$estimate
+    p_Vals_50_5[s,2] <- shal_hold_50_5$p.value
+  }
+}
+
+# write_csv(as.data.frame(r_Vals_25_1), here("ModelBuild", "FisheryData", "CatchComparison_r_steady_25_1.csv"))
+# write_csv(as.data.frame(r_Vals_25_5), here("ModelBuild", "FisheryData", "CatchComparison_r_steady_25_5.csv"))
+# write_csv(as.data.frame(r_Vals_35_1), here("ModelBuild", "FisheryData", "CatchComparison_r_steady_35_1.csv"))
+# write_csv(as.data.frame(r_Vals_35_5), here("ModelBuild", "FisheryData", "CatchComparison_r_steady_35_5.csv"))
+# write_csv(as.data.frame(r_Vals_50_1), here("ModelBuild", "FisheryData", "CatchComparison_r_steady_50_1.csv"))
+# write_csv(as.data.frame(r_Vals_50_5), here("ModelBuild", "FisheryData", "CatchComparison_r_steady_50_5.csv"))
+# 
+# write_csv(as.data.frame(p_Vals_25_1), here("ModelBuild", "FisheryData", "CatchComparison_p_steady_25_1.csv"))
+# write_csv(as.data.frame(p_Vals_25_5), here("ModelBuild", "FisheryData", "CatchComparison_p_steady_25_5.csv"))
+# write_csv(as.data.frame(p_Vals_35_1), here("ModelBuild", "FisheryData", "CatchComparison_p_steady_35_1.csv"))
+# write_csv(as.data.frame(p_Vals_35_5), here("ModelBuild", "FisheryData", "CatchComparison_p_steady_35_5.csv"))
+# write_csv(as.data.frame(p_Vals_50_1), here("ModelBuild", "FisheryData", "CatchComparison_p_steady_50_1.csv"))
+# write_csv(as.data.frame(p_Vals_50_5), here("ModelBuild", "FisheryData", "CatchComparison_p_steady_50_5.csv"))
+
+```
+
+
+Plot things
+```{r}
+# pdf(here("ModelBuild", "FisheryData", "DeepSet_InitialCatchComparisons.pdf"), width = 10, height = 8)
+par(mfrow = c(3,6))
+par(pin = c(1,1))
+for (s in seq(1, 18, 1)) {
+  plot(log10(w), log10(ObsDeep[s,]), type = "l", xlim = c(-3, 6), ylim = c(0, 5),
+       main = sp[s], col = "black",
+       xlab = "log10(body weight in grams)", ylab = "log10(number caught)")
+  lines(x = log10(w), y = log10(ModDeep_25_1[s,]*0.066), col = "darkorchid", xlim = c(-3,6), ylim = c(0,5))
+  lines(x = log10(w), y = log10(ModDeep_25_5[s,]*0.066), col = "darkorchid1", xlim = c(-3,6), ylim = c(0,5))
+  lines(x = log10(w), y = log10(ModDeep_35_1[s,]*0.066), col = "seagreen", xlim = c(-3,6), ylim = c(0,5))
+  lines(x = log10(w), y = log10(ModDeep_35_5[s,]*0.066), col = "seagreen3", xlim = c(-3,6), ylim = c(0,5))
+  lines(x = log10(w), y = log10(ModDeep_50_1[s,]*0.066), col = "steelblue", xlim = c(-3,6), ylim = c(0,5))
+  lines(x = log10(w), y = log10(ModDeep_50_5[s,]*0.066), col = "steelblue1", xlim = c(-3,6), ylim = c(0,5))
+  text(x = -2, y = 4.5, signif(r_Vals_25_1[s,1], 2), col = "darkorchid", xlim = c(-3,6), ylim = c(0,5))
+  text(x = -2, y = 4.0, signif(r_Vals_25_5[s,1], 2), col = "darkorchid1", xlim = c(-3,6), ylim = c(0,5))
+  text(x = -2, y = 3.5, signif(r_Vals_35_1[s,1], 2), col = "seagreen", xlim = c(-3,6), ylim = c(0,5))
+  text(x = -2, y = 3.0, signif(r_Vals_35_5[s,1], 2), col = "seagreen3", xlim = c(-3,6), ylim = c(0,5))
+  text(x = -2, y = 2.5, signif(r_Vals_50_1[s,1], 2), col = "steelblue", xlim = c(-3,6), ylim = c(0,5))
+  text(x = -2, y = 2.0, signif(r_Vals_50_5[s,1], 2), col = "steelblue1", xlim = c(-3,6), ylim = c(0,5))
+  if (s == 3 | s == 13 | s == 16) {
+    points(log10(w), log10(ObsDeep[s,]), xlim = c(-3, 6), ylim = c(0, 5), col = "black")
+  }
+}
+# dev.off()
+
+# pdf(here("ModelBuild", "FisheryData", "ShallowSet_InitialCatchComparisons.pdf"), width = 10, height = 8)
+par(mfrow = c(3,6))
+par(pin = c(1,1))
+for (s in seq(1, 18, 1)) {
+  plot(log10(w), log10(ObsShal[s,]), type = "l", xlim = c(-3, 6), ylim = c(0, 4),
+       main = sp[s], col = "black",
+       xlab = "log10(body weight in grams)", ylab = "log10(number caught)")
+  lines(x = log10(w), y = log10(ModShal_25_1[s,]*0.33), col = "darkorchid", xlim = c(-3,6), ylim = c(0,4))
+  lines(x = log10(w), y = log10(ModShal_25_5[s,]*0.33), col = "darkorchid1", xlim = c(-3,6), ylim = c(0,4))
+  lines(x = log10(w), y = log10(ModShal_35_1[s,]*0.33), col = "seagreen", xlim = c(-3,6), ylim = c(0,4))
+  lines(x = log10(w), y = log10(ModShal_35_5[s,]*0.33), col = "seagreen3", xlim = c(-3,6), ylim = c(0,4))
+  lines(x = log10(w), y = log10(ModShal_50_1[s,]*0.33), col = "steelblue", xlim = c(-3,6), ylim = c(0,4))
+  lines(x = log10(w), y = log10(ModShal_50_5[s,]*0.33), col = "steelblue1", xlim = c(-3,6), ylim = c(0,4))
+  text(x = -2, y = 3.5, signif(r_Vals_25_1[s,2], 2), col = "darkorchid", xlim = c(-3,6), ylim = c(0,4))
+  text(x = -2, y = 3.0, signif(r_Vals_25_5[s,2], 2), col = "darkorchid1", xlim = c(-3,6), ylim = c(0,4))
+  text(x = -2, y = 2.5, signif(r_Vals_35_1[s,2], 2), col = "seagreen", xlim = c(-3,6), ylim = c(0,4))
+  text(x = -2, y = 2.0, signif(r_Vals_35_5[s,2], 2), col = "seagreen3", xlim = c(-3,6), ylim = c(0,4))
+  text(x = -2, y = 1.5, signif(r_Vals_50_1[s,2], 2), col = "steelblue", xlim = c(-3,6), ylim = c(0,4))
+  text(x = -2, y = 1.0, signif(r_Vals_50_5[s,2], 2), col = "steelblue1", xlim = c(-3,6), ylim = c(0,4))
+  if (s == 3 | s == 13 | s == 16) {
+    points(log10(w), log10(ObsShal[s,]), xlim = c(-3, 6), ylim = c(0,4), col = "black")
+  }
+}
+# dev.off()
+```
+
+
