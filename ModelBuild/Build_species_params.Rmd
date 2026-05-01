@@ -838,7 +838,7 @@ species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark
 
 species_params <- add_param_info(species_params, "OceanicWhitetipShark", "depth_max", 200)
 species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "depth_max",
-                                 "@/oung2020, @TremblayBoyer2019")
+                                 "@Joung2020, @TremblayBoyer2019")
 
 species_params <- add_param_info(species_params, "OceanicWhitetipShark", "beta", 359)
 species_params_refs <- add_param_info(species_params_refs, "OceanicWhitetipShark", "beta",
