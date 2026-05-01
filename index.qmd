@@ -1,0 +1,35 @@
+## Overview {.unnumbered}
+
+The model presented here is an updated version of that used in 
+[Woodworth-Jefcoats et al. 2019](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full). 
+This updated version:  
+
+* includes additional species,
+* explicitly represents both the deep-set and shallow-set fisheries, and
+* makes use of updated [mizer](https://sizespectrum.org/mizer/) capabilities.
+
+To get the most out of this site, it's recommended that you also visit the 
+linked RMarkdown scripts in the [accompanying repo](https://github.com/noaa-pifsc/Pelagic-mizer-model).
+
+## What's here {.unnumbered}
+
+This site takes you through the system that's being modeled and discusses the data
+used in parameterizing the model.  It provides an overview of the calibration/
+validation process, including discussing which parameters were changed from their
+default values and why.  It then walks through a brief guide to running this
+particular mizer model and offers some ideas for simulations.  Citations for all
+references are provided.
+
+## Resources {.unnumbered}
+
+The [mizer](https://sizespectrum.org/mizer/) site includes model documentation,
+tutorials, and more.  If you're unfamiliar with mizer, start there and then come
+back to this specific model. The [sizespectrum](https://github.com/sizespectrum/) 
+GitHub site includes a number of repositories hosting extensions of the mizer model.
+And, [mizerExperimental](https://sizespectrum.org/mizerExperimental/) has 
+additional functionality that users might find helpful.
+
+## Acknowledgements {.unnumbered}
+The [PIFSC PSD field manual](https://pifsc-protected-species-division.github.io/PMNM-ARCamps-Manual/)
+was an inspiration and a helpful model.  The [R for Plant Disease Epidemiology](https://github.com/emdelponte/epidemiology-R) 
+Quarto book provided a template from which to work.   Thank you!!

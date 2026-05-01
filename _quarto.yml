@@ -1,0 +1,85 @@
+project:
+  type: book
+  output-dir: docs
+execute:
+  cache: true
+  freeze: auto
+book:
+  title: "Pelagic mizer model"
+  subtitle: "An updated mizer model for Hawaiʻi-based longline fisheries"
+  author: 
+    - name: "Phoebe Woodworth-Jefcoats"
+    - name: "Another author here"
+    - name: "and another author here"
+  date: June 2026
+  date-format: long
+  license: "CC BY"
+  sidebar:
+    background: "#D9E3E4"
+    search: true
+    style: floating
+    collapse-level: 1
+    border: true
+  repo-url: https://github.com/noaa-pifsc/Pelagic-mizer-model
+  repo-actions: [edit, issue]
+  page-footer: 
+    border: false
+    background: light
+    left: | 
+      &copy; CC-1.0
+    right: |
+      This book was built with <a href="https://quarto.org/">Quarto</a>.
+    
+  chapters:
+    - index.qmd
+    - AboutFisheries.qmd
+    - AboutData.qmd
+    - SpeciesParams.qmd
+    - FishingParams.qmd
+    - CalVal.qmd
+    - RunningMizer.qmd
+    - PossibleApps.qmd
+    # - part: "Epidemic data"
+    #   chapters:
+    #     - data-terminology.qmd
+    #     - data-ordinal.qmd
+    #     - data-actual-severity.qmd
+    #     - data-accuracy.qmd
+    #     - data-sads.qmd
+    #     - data-training.qmd
+    #     - data-remote-sensing.qmd
+    #     
+    #     
+    # - part: "Temporal analysis"
+    #   chapters: 
+    #     - temporal-dpc.qmd
+    #     - temporal-models.qmd
+    #     - temporal-fitting.qmd
+    # - part: "Spatial analysis"
+    #   chapters:
+    #     - spatial-gradients.qmd
+    #     - spatial-models.qmd
+    #     - spatial-fitting.qmd
+    #     - spatial-patterns.qmd
+    #     - spatial-tests.qmd
+    # - part: "Epidemics and yield"
+    #   chapters:
+    #     - yieldloss-concepts.qmd
+    #     - yieldloss-regression-models.qmd
+    # - part: "Disease prediction"
+    #   chapters: 
+    #     - prediction-warning-systems.qmd
+    #     - prediction-disease-modeling.qmd
+    - references.qmd
+
+
+bibliography: references.bib
+
+prefer-html: true
+format:
+  html:
+    toc: true
+    toc-depth: 5
+    theme: 
+      light: 
+        - cosmo

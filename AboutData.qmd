@@ -1,0 +1,55 @@
+# Data used {#sec-AboutData}
+
+This model is the beneficiary of several existing datasets, which are accessible
+to varying degrees. 
+
+## Fisheries data
+
+All information about this fishery comes from Pacific Islands Region Observer 
+Program [data](https://www.fisheries.noaa.gov/inport/item/16865).  Observers are
+mandated to cover all shallow-set swordfish trips and 20% of deep-set bigeye
+tuna trips (@PIROP2026).  They measure a plethora of operational details 
+including the time, location, and amount of all effort set (with effort being
+the number of hooks).  They also record all catch regardless of commercial value.
+Finally, since February 2006, observers have maintained the protocol of 
+measuring the length of every third fish caught[^1].  These factors combine to
+make observer data our best source for understanding how many of what size of
+each species fish are caught.  The size part is particularly helpful for mizer.
+
+[^1]: Personal communication from knowledgeable staff at the Pacific Islands 
+Fisheries Science Center and Pacific Islands Regional Office.
+
+We use data from February 2006 through December 2024 to encompass the period 
+during which a consistent measurement protocol was in place, ending with the 
+most recent complete year available at time of download.  Observer data are 
+subject to confidentiality of information requirements under 
+the Magnuson–Stevens Fishery Conservation and Management Act (Magnuson–Stevens
+Act or MSA) and are not available to the public except in summary aggregate form.
+
+## Fish data
+
+Diet data for the species modeled here came largely from @Barnes2008.  Data were 
+filtered to retain pelagic habitats and species representative of the model 
+domain and species composition. Species-specific diet information was available 
+for bigeye tuna, swordfish, yellowfin tuna, and albacore tuna (see below for 
+this species).  For the remaining species, filtered data were grouped to 
+identify generic values for teleosts and sharks.  Data for albacore tuna from 
+@Barnes2008 were combined with albacore tuna diet data from @Pinnegar2015 and 
+@Goni2014.  These data informed feeding kernal parameters.
+
+Information for remaining parameters was taken from the literature (see @sec-SpeciesParams).
+When data for needed parameters wasn't in the literature, we turned to [FishLife](https://james-thorson-noaa.github.io/FishLife/)
+(@Thorson2023) and [FishBase](https://fishbase.org/) (@FishBase2026).
+
+All data described in this section are publicly available and can be accessed
+using links included here and by following information in the citations.
+
+## Oceanographic data
+
+We used the World Ocean Atlas ([WOA](https://www.ncei.noaa.gov/products/world-ocean-atlas)) 
+as our source of oceanographic data.  We used annual climatologies of 
+temperature (@WOAtemp) and oxygen (@WOAoxygen) to identify the boundaries 
+discussed in [@sec-AboutFisheries].  WOA data are freely publicly accessible and 
+can be accessed by using the link in this section and by following information 
+in the citations.
+

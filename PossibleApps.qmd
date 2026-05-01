@@ -1,0 +1,77 @@
+# Possible model applications {#sec-Possibilities}
+
+The information provided here is only the foundation for simulations.  There are
+endless scenarios that could be modeled.  Here, we discuss a few.
+
+## Testing hypothetical future fishing scenarios
+
+[Mizer](https://sizespectrum.org/mizer/) allows time-varying fishing effort in 
+simulations. To do this, you need to create a data frame where each row is a 
+time step and each column is one of the fishing gears you set up in your 
+parameters.  If you want to introduce a new fishery at some point, you'd need to
+include it in your parameters and set the initial effort to 0.  Subsequent 
+effort would also be 0 until the time point when you want to introduce the 
+fishery.  
+
+Some possible questions that may be interesting in this region include:  
+
+* What happens if the balance of effort between deep-set and shallow-set 
+sectors changes?
+* What would happen if international competition increased or decreased?  (This
+would require creating and parameterizing an additional international fleet.)
+* How might increased or decreased purse seine effort affect the food web and
+modeled fisheries? (This would require creating and parameterizing an additional 
+purse seine fleet.)
+
+## Hindcasting, forecasting, and projecting
+
+A handy thing about [mizer](https://sizespectrum.org/mizer/) is that, while it 
+was originally developed to the effects of fishing mortality, you can extend it 
+to incorporate environmental effects on fish.  
+
+Functionality exists to drive the background resource with either satellite
+remotely sensed or modeled data.  We've added 
+[code](https://github.com/noaa-pifsc/Pelagic-mizer-model/tree/main/LinkingEnvironmentalData) 
+for each of these approaches
+in our [repository](https://github.com/noaa-pifsc/Pelagic-mizer-model). 
+Functionality also exists to incorporate the effects of ocean temperature on 
+fish through using the [therMizer](https://github.com/sizespectrum/therMizer) 
+extension.  To use [therMizer](https://github.com/sizespectrum/therMizer) you 
+need to know or estimate species' thermal tolerance limits and have a source of 
+ocean temperature data.  
+
+It could be interesting to use data about the past (empirical or modeled) to 
+replicate past catch and, subsequently, forecast future catch.  For future 
+environmental conditions you could use climatological data or modeled seasonal
+forecast data.  You can also use earth system model output to inform climate-
+based projections.  
+
+## Other sources of mortality
+
+Marine food webs are affected by forces beyond climate and fishing.  For 
+example, deep-sea mining could affect fish mortality.  Ocean acidification may
+affect fish both directly through their physiology and indirectly through their
+habitat.  You could create a function to capture a specific source of mortality
+and use mizer's built-in [setRateFunction](https://sizespectrum.org/mizer/reference/setRateFunction.html)
+to incorporate it into your scenario.  Note that this function allows you to 
+change any rate function.  So, for example, you could incorporate the affects of
+changing oxygen concentrations on predation rates.
+
+## Food limitation and other ecological theories
+
+The results of this model are sensitive to what's decided about food limitation.
+If the system isn't food limited, then effects on the background resource will
+have limited effect on the fish.  If the system is food limited, then effects on
+the background resource will have clear effects on the fish.  And to some degree
+one has to make an assumption of food limitation to pursue some of the ideas 
+suggested above.  Because [mizer](https://sizespectrum.org/mizer/) is based on
+robust yet simple ecological theory, it is straightforward to test this and 
+other competing assumptions.  One could also use [mizer](https://sizespectrum.org/mizer/)
+to explore other theoretical ecological questions, such as the degree to which
+ecosystems behave like economies and vice versa (e.g., ref)
+
+## Sharing your simulations with others
+
+If you make use of our model, please [open an issue](https://github.com/noaa-pifsc/Pelagic-mizer-model/issues)
+and let us know.  We can add a section on applications and publications to allow
+modelers to connect and learn from one another.
