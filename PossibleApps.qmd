@@ -68,7 +68,7 @@ suggested above.  Because [mizer](https://sizespectrum.org/mizer/) is based on
 robust yet simple ecological theory, it is straightforward to test this and 
 other competing assumptions.  One could also use [mizer](https://sizespectrum.org/mizer/)
 to explore other theoretical ecological questions, such as the degree to which
-ecosystems behave like economies and vice versa (e.g., ref)
+ecosystems behave like economies and vice versa (e.g., @Vermeij2011)
 
 ## Sharing your simulations with others
 
