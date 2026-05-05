@@ -1,7 +1,6 @@
 ## Overview {.unnumbered}
 
-The model presented here is an updated version of that used in 
-[Woodworth-Jefcoats et al. 2019](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full). 
+The model presented here is an updated version of that used in @WoodworthJefcoats2019. 
 This updated version:  
 
 * includes additional species,
