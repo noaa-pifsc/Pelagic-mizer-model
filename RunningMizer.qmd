@@ -6,9 +6,9 @@ for Hawaiʻi-based longline fisheries.  We note that when building the model as
 described in the previous sections it was necessary to run the model throughout
 the build process to identify challenges and access parameters.  For example, 
 when binning observed catch-at-size (see @sec-FishingParams), we had to run 
-[mizer](https://sizespectrum.org/mizer/) in order to extract the size bins.  All 
-this is to say, while we present things here as a straightforward unidirectional 
-workflow, know that building and working with your own model will be interative.
+mizer in order to extract the size bins.  All this is to say, while we present 
+things here as a straightforward unidirectional workflow, know that building and 
+working with your own model will be interative.
 
 [Mizer](https://sizespectrum.org/mizer/) runs in [R](https://www.r-project.org/).
 We recommend using [RStudio](https://posit.co/products/open-source/rstudio) or
@@ -48,10 +48,10 @@ pelagic_gear_params <- read.csv(here("Pelagic_gear_params_25_1.csv"), row.names 
 pelagic_interaction <- read.csv(here("Pelagic_interaction.csv"), row.names = 1)
 ```
 
-We added `catchability` to the species parameters because it made it easier to 
-track the references we used.  It also allowed us to easily <add> them to the 
-gear parameters. We're going to remove that column now, just to avoid any 
-possible confusion down the line.
+We added *catchability* to the species parameters because it made it easier to 
+track the references we used.  It also allowed us to easily [add](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/FisheryData/CatchSpectra.Rmd) 
+them to the gear parameters. We're going to remove that column now, just to 
+avoid any possible confusion down the line.
 ```{r}
 pelagic_species_params <- pelagic_species_params |>
   mutate(catchability = NULL)
@@ -76,13 +76,9 @@ pelagic_params <- newMultispeciesParams(species_params = pelagic_species_params,
 
 Notice that we received a message about some assumptions the model made based on
 the information we did and didn't give it.  This step created a full set of 
-parameters that [mizer](https://sizespectrum.org/mizer/)
-will use to run simulations.  To look at the species parameters, for example:
-```{r, eval = FALSE}
-pelagic_params@species_params
-```
-
-You can use similar syntax to take a look at the other parameters.  
+parameters that mizer will use to run simulations.  To look at the species 
+parameters, for example, use `pelagic_params@species_params`.  You can use 
+similar syntax to take a look at the other parameters.  
 
 The next step is to run the model to a steady state:
 ```{r}
@@ -93,7 +89,7 @@ The default time allowed for this is 100 years, but you can extend that if
 if needed: `steady(pelagic_params, t_max = 500)` would allow 500 years.  Note 
 that while we were building our model early iterations of this step resulted in
 various warnings that led us to reexamine parameters.  For example, larger 
-values of `kappa` led to warnings about unrealistic values for `erepro`.  We
+values of *kappa* led to warnings about unrealistic values for *erepro*.  We
 recommend turning to [mizer's](https://sizespectrum.org/mizer/) extensive
 documentation if you're encountering errors while building your own model.  If
 you encounter errors using the parameters we provided, please 
@@ -101,20 +97,22 @@ you encounter errors using the parameters we provided, please
 us know.
 
 At this point, you can take a look at the size spectra of your steady-state 
-model: 
+model in @fig-steady-spectra.
 ```{r}
+#| message: false
+#| label: fig-steady-spectra
+#| fig-cap: Steady-state model spectra (note that the "Total" line mostly covers up the "Resource" line)
+#| fig-alt: Biomass spectra that suggest the model is performing reasonably
+
 plotlySpectra(pelagic_steady, power = 2, total = TRUE)
 ```
 
 A full list of plotting options is available in the mizer 
 [documentation](https://sizespectrum.org/mizer/reference/index.html#plotting-results).
 
-Note that when running to a stead state, [mizer](https://sizespectrum.org/mizer/)
-recalculates some parameters.  To see what parameters are being used you can 
-take a similar approach to that used above.  For example:
-```{r, eval = FALSE}
-pelagic_steady@species_params
-```
+Note that when running to a steady state, mizer recalculates some 
+parameters.  To see what parameters are being used you can 
+take a similar approach to that used above (`pelagic_steady@species_params`).
 
 You're now ready to run a simulation.  The details of your simulation are
 entirely up to you and your collaborators (we offer some ideas in @sec-Possibilities).
@@ -134,4 +132,4 @@ for a full list of what you can view.
 plot(pelagic_sim)
 ```
 
-![](OverviewContent/sim_fig.png)
+![Summary plot for a mizer simulation](OverviewContent/sim_fig.png){#fig-sim alt="five-paneled figure showing feeding level, biomass, predation mortality, fishing mortality, and biomass spectra for each of the modeled species"}
