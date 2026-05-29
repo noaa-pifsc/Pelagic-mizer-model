@@ -15,22 +15,22 @@ selectivity parameter permutations we tested and their resulting significant
 (*p* < 0.05) correlation coefficients.  Modeled and observed catch-at-size was
 compared and figures were generated with [this code](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/FisheryData/CatchComparison.Rmd).
 
-In addition to trialing different thresholds for `sigmoidal_weight` and 
-`sigmoidal_sigma` we also tested several values for `kappa` which is a 
+In addition to trialing different thresholds for *sigmoidal_weight* and 
+*sigmoidal_sigma* we also tested several values for *kappa* which is a 
 parameter that informs initial abundances.  In the end, we kept the 
 default value (10^11^) because it resulted in catch magnitudes that most 
 closely matched observed catch.
 
 We also changed the following default parameters:  
 
-* `w_pp_cutoff`: Because this model is mostly apex predators, we extended the 
+* *w_pp_cutoff*: Because this model is mostly apex predators, we extended the 
 maximum size of the background resource to span the full size range of modeled
 fish.  This acknowledges that there are a lot of species in this food web that
 we're not modeling.  
-* `n`: We set this allometric scaling exponent for maximum intake rate to be 3/4.
+* *n*: We set this allometric scaling exponent for maximum intake rate to be 3/4.
 There are different theories on what value is appropriate and likely no single
 answer is correct.  
-* `p`: We set this allometric scaling exponent for metabolic rate to be 3/4.
+* *p*: We set this allometric scaling exponent for metabolic rate to be 3/4.
 Like the previous parameter, there are different theories on what value is 
 appropriate and likely no single answer is correct.
 

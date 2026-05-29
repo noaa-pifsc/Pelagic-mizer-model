@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./RunningMizer.html" rel="next">
+<link href="./ImproveFit.html" rel="next">
 <link href="./FishingParams.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -147,14 +147,20 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./ImproveFit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Fit Improvement Options</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./RunningMizer.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Running mizer</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Running mizer</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./PossibleApps.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Possible model applications</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Possible model applications</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -196,14 +202,14 @@ ul.task-list li input[type="checkbox"] {
 <p>The previous sections present the final parameters that we settled on after much work and adjusting. The process by which these came together involved quite a bit of iteration, particularly setting the selectivity parameters.</p>
 <p>We have elected to fit our modeled catch-at-size to observed catch-at-size. This is the best, most comprehensive information we have about the system we’re modeling. While this approach doesn’t quite fit the bill for validation, it’s the best we can do with what we have and offers a reasonable calibration approach.</p>
 <p>Figures <a href="#fig-calval-deep" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> and <a href="#fig-calval-shal" class="quarto-xref">Figure&nbsp;<span>5.2</span></a> below show a variety of selectivity parameter permutations we tested and their resulting significant (<em>p</em> &lt; 0.05) correlation coefficients. Modeled and observed catch-at-size was compared and figures were generated with <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/FisheryData/CatchComparison.Rmd">this code</a>.</p>
-<p>In addition to trialing different thresholds for <code>sigmoidal_weight</code> and <code>sigmoidal_sigma</code> we also tested several values for <code>kappa</code> which is a parameter that informs initial abundances. In the end, we kept the default value (10<sup>11</sup>) because it resulted in catch magnitudes that most closely matched observed catch.</p>
+<p>In addition to trialing different thresholds for <em>sigmoidal_weight</em> and <em>sigmoidal_sigma</em> we also tested several values for <em>kappa</em> which is a parameter that informs initial abundances. In the end, we kept the default value (10<sup>11</sup>) because it resulted in catch magnitudes that most closely matched observed catch.</p>
 <p>We also changed the following default parameters:</p>
 <ul>
-<li><code>w_pp_cutoff</code>: Because this model is mostly apex predators, we extended the maximum size of the background resource to span the full size range of modeled fish. This acknowledges that there are a lot of species in this food web that we’re not modeling.<br>
+<li><em>w_pp_cutoff</em>: Because this model is mostly apex predators, we extended the maximum size of the background resource to span the full size range of modeled fish. This acknowledges that there are a lot of species in this food web that we’re not modeling.<br>
 </li>
-<li><code>n</code>: We set this allometric scaling exponent for maximum intake rate to be 3/4. There are different theories on what value is appropriate and likely no single answer is correct.<br>
+<li><em>n</em>: We set this allometric scaling exponent for maximum intake rate to be 3/4. There are different theories on what value is appropriate and likely no single answer is correct.<br>
 </li>
-<li><code>p</code>: We set this allometric scaling exponent for metabolic rate to be 3/4. Like the previous parameter, there are different theories on what value is appropriate and likely no single answer is correct.</li>
+<li><em>p</em>: We set this allometric scaling exponent for metabolic rate to be 3/4. Like the previous parameter, there are different theories on what value is appropriate and likely no single answer is correct.</li>
 </ul>
 <p>These parameters resulted in a model with:</p>
 <ul>
@@ -236,7 +242,7 @@ Figure&nbsp;5.2: Comparison of observed and modeled shallow-set catch at size un
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn1"><p>This implies that our system is not food limited, which is interesting to think about. Since our goal was to build a steady state model in which all modeled species coexist, this assumption seems fitting. However, you can explore questions of food limitation with mizer. See <a href="PossibleApps.html" class="quarto-xref"><span>Chapter 7</span></a> for more on this.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>This implies that our system is not food limited, which is interesting to think about. Since our goal was to build a steady state model in which all modeled species coexist, this assumption seems fitting. However, you can explore questions of food limitation with mizer. See <a href="PossibleApps.html" class="quarto-xref"><span>Chapter 8</span></a> for more on this.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
@@ -665,8 +671,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./RunningMizer.html" class="pagination-link" aria-label="Running mizer">
-        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Running mizer</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./ImproveFit.html" class="pagination-link" aria-label="Fit Improvement Options">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Fit Improvement Options</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
