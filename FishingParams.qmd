@@ -31,9 +31,9 @@ for estimates and their sources.
 
 Selectivity *(S)* was informed by observer data (see @sec-AboutData).  We used
 [mizer's](https://sizespectrum.org/mizer/) `sigmoid_weight` selectivity function
-and set `sigmoidal_weight` to the smallest size that experiences at least 25%
+and set *sigmoidal_weight* to the smallest size that experiences at least 25%
 as much catch (in number of fish caught) at the size that sees the greatest 
-catch and `sigmoidal_sigma` as the number of size classes that experience at
+catch and *sigmoidal_sigma* as the number of size classes that experience at
 least 1% as much catch as the size the sees the greatest catch. An example of 
 these values for bigeye tuna are shown in @fig-S below.  When determining
 these values, we binned sizes to match those used in our mizer model (see 
@@ -70,7 +70,7 @@ kable(gear_params)
 #| echo: false
 #| message: false
 #| label: fig-F
-#| fig-cap: Species-specific catch at size as parameterized in our mizer model
+#| fig-cap: Species- and size-specific fishing mortality as parameterized in our mizer model
 #| fig-alt: line plots showing that catch is greatest for the largest sizes of each species and that these values match assessment estimates
 
 # load package
