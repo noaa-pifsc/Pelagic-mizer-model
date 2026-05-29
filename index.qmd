@@ -13,11 +13,12 @@ linked RMarkdown scripts in the [accompanying repo](https://github.com/noaa-pifs
 ## What's here {.unnumbered}
 
 This site takes you through the system that's being modeled and discusses the data
-used in parameterizing the model.  It provides an overview of the calibration/
-validation process, including discussing which parameters were changed from their
-default values and why.  It then walks through a brief guide to running this
-particular mizer model and offers some ideas for simulations.  Citations for all
-references are provided.
+used in parameterizing the model.  It provides an overview of the 
+calibration/validation process, including discussing which parameters were 
+changed from their default values and why.  It then discusses several possible 
+approaches to improving the model's fit to observed catch, walks through a brief 
+guide to running this particular mizer model, and offers some ideas for 
+simulations.  Citations for all references are provided.
 
 ## Resources {.unnumbered}
 
