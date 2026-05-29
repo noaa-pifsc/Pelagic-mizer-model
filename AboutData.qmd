@@ -29,13 +29,15 @@ Act or MSA) and are not available to the public except in summary aggregate form
 ## Fish data
 
 Diet data for the species modeled here came largely from @Barnes2008.  Data were 
-filtered to retain pelagic habitats and species representative of the model 
+[filtered](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/DietData/BarnesDietData.Rmd) 
+to retain pelagic habitats and species representative of the model 
 domain and species composition. Species-specific diet information was available 
 for bigeye tuna, swordfish, yellowfin tuna, and albacore tuna (see below for 
 this species).  For the remaining species, filtered data were grouped to 
 identify generic values for teleosts and sharks.  Data for albacore tuna from 
-@Barnes2008 were combined with albacore tuna diet data from @Pinnegar2015 and 
-@Goni2014.  These data informed feeding kernal parameters.
+@Barnes2008 were [combined](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/DietData/AlbacoreDietData.Rmd) 
+with albacore tuna diet data from @Pinnegar2015 and @Goni2014.  These data 
+informed feeding kernal parameters.
 
 Information for remaining parameters was taken from the literature (see @sec-SpeciesParams).
 When data for needed parameters wasn't in the literature, we turned to [FishLife](https://james-thorson-noaa.github.io/FishLife/)
