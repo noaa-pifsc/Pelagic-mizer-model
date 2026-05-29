@@ -9,8 +9,8 @@ book:
   subtitle: "An updated mizer model for Hawaiʻi-based longline fisheries"
   author: 
     - name: "Phoebe Woodworth-Jefcoats"
-    - name: "Another author here"
-    - name: "and another author here"
+    - name: "Beth Lumsden"
+    - name: "Joseph M. O'Malley"
   date: June 2026
   date-format: long
   license: "CC BY"
@@ -37,39 +37,9 @@ book:
     - SpeciesParams.qmd
     - FishingParams.qmd
     - CalVal.qmd
+    - ImproveFit.qmd
     - RunningMizer.qmd
     - PossibleApps.qmd
-    # - part: "Epidemic data"
-    #   chapters:
-    #     - data-terminology.qmd
-    #     - data-ordinal.qmd
-    #     - data-actual-severity.qmd
-    #     - data-accuracy.qmd
-    #     - data-sads.qmd
-    #     - data-training.qmd
-    #     - data-remote-sensing.qmd
-    #     
-    #     
-    # - part: "Temporal analysis"
-    #   chapters: 
-    #     - temporal-dpc.qmd
-    #     - temporal-models.qmd
-    #     - temporal-fitting.qmd
-    # - part: "Spatial analysis"
-    #   chapters:
-    #     - spatial-gradients.qmd
-    #     - spatial-models.qmd
-    #     - spatial-fitting.qmd
-    #     - spatial-patterns.qmd
-    #     - spatial-tests.qmd
-    # - part: "Epidemics and yield"
-    #   chapters:
-    #     - yieldloss-concepts.qmd
-    #     - yieldloss-regression-models.qmd
-    # - part: "Disease prediction"
-    #   chapters: 
-    #     - prediction-warning-systems.qmd
-    #     - prediction-disease-modeling.qmd
     - references.qmd
 
 
