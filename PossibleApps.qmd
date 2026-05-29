@@ -26,8 +26,8 @@ purse seine fleet.)
 ## Hindcasting, forecasting, and projecting
 
 A handy thing about [mizer](https://sizespectrum.org/mizer/) is that, while it 
-was originally developed to the effects of fishing mortality, you can extend it 
-to incorporate environmental effects on fish.  
+was originally developed to examine the effects of fishing mortality, you can 
+extend it to incorporate environmental effects on fish.  
 
 Functionality exists to drive the background resource with either satellite
 remotely sensed or modeled data.  We've added 
@@ -64,11 +64,11 @@ If the system isn't food limited, then effects on the background resource will
 have limited effect on the fish.  If the system is food limited, then effects on
 the background resource will have clear effects on the fish.  And to some degree
 one has to make an assumption of food limitation to pursue some of the ideas 
-suggested above.  Because [mizer](https://sizespectrum.org/mizer/) is based on
-robust yet simple ecological theory, it is straightforward to test this and 
-other competing assumptions.  One could also use [mizer](https://sizespectrum.org/mizer/)
-to explore other theoretical ecological questions, such as the degree to which
-ecosystems behave like economies and vice versa (e.g., @Vermeij2011)
+suggested above.  Because mizer is based on robust yet simple ecological theory, 
+it is straightforward to test this and other competing assumptions.  One could 
+also use mizer to explore other theoretical ecological questions, such as the 
+degree to which ecosystems behave like economies and vice versa 
+(e.g., @Vermeij2011)
 
 ## Sharing your simulations with others
 
