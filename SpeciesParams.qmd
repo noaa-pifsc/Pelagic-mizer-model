@@ -17,11 +17,11 @@ final parameters were added to a data frame using a [script](https://github.com/
 although you could absolutely do this step in the spreadsheet editor of your choice
 (and it would probably be easier).
 
-In @tbl-params, the NA values for weight-related parameters (e.g., `w_mat`, 
-`w_max`) indicate weights that are converted from lengths using the `a` and `b`
-parameters.  NA values for `a` and `b` parameters indicate sexually dimorphic
+In @tbl-params, the NA values for weight-related parameters (e.g., *w_mat*, 
+*w_max*) indicate weights that are converted from lengths using the *a* and *b*
+parameters.  NA values for *a* and *b* parameters indicate sexually dimorphic
 species.  In these cases, weights are calculated for each sex and then averaged.
-NA values for length-related parameters (e.g., `l_mat`, `l_max`) indicated 
+NA values for length-related parameters (e.g., *l_mat*, *l_max*) indicate 
 species for which the cooresponding weights were available without conversion. 
 These NA values all carry through to @tbl-refs.
 
@@ -29,11 +29,11 @@ In @tbl-refs, default indicates paramters that were estimated following the
 [prior](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full)
 methodology: 
 
-* `w_min`: all teleosts enter at 1 mg 
-* `R_max`: scaled from maximum body size as 10^11^ $\times$ *w~max~*^-1.5^ (@Blanchard2014) 
-* `w_min`: species' minimum depth is 0 m in the absence of evidence to the contrary
+* *w_min*: all teleosts enter at 1 mg 
+* *R_max*: scaled from maximum body size as 10^11^ $\times$ *w~max~*^-1.5^ (@Blanchard2014) 
+* *w_min*: species' minimum depth is 0 m in the absence of evidence to the contrary
 
-Each species' minimum and maximum depths (`depth_min` and `depth_max`, 
+Each species' minimum and maximum depths (*depth_min* and *depth_max*, 
 respectively) were used by a [script](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/Build_interaction_matrix.Rmd)
 to build the interaction matrix (@tbl-inter) based on vertical overlap (see the 
 [original model](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full)

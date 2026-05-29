@@ -196,14 +196,20 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./ImproveFit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Fit Improvement Options</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./RunningMizer.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Running mizer</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Running mizer</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./PossibleApps.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Possible model applications</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Possible model applications</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -244,14 +250,14 @@ window.Quarto = {
 
 <p>Gathering needed species parameters is probably the biggest job in building a mizer model, particularly if you’re working with poorly understood species in a data-poor region. Working with a team makes the job easier<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. It also helps that mizer will estimate many parameters for you based on sound science. See their <a href="https://sizespectrum.org/mizer/">site</a> for more.</p>
 <p>To start, we gathered the parameters listed in <a href="#tbl-params" class="quarto-xref">Table&nbsp;<span>3.1</span></a> by consulting the corresponding references listed in <a href="#tbl-refs" class="quarto-xref">Table&nbsp;<span>3.2</span></a>. While these tables look nice and tidy, there was ample background work involved. Our team had a shared Google doc where we noted parameters and left helpful feedback for one another. The final parameters were added to a data frame using a <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/Build_species_params.Rmd">script</a>, although you could absolutely do this step in the spreadsheet editor of your choice (and it would probably be easier).</p>
-<p>In <a href="#tbl-params" class="quarto-xref">Table&nbsp;<span>3.1</span></a>, the NA values for weight-related parameters (e.g., <code>w_mat</code>, <code>w_max</code>) indicate weights that are converted from lengths using the <code>a</code> and <code>b</code> parameters. NA values for <code>a</code> and <code>b</code> parameters indicate sexually dimorphic species. In these cases, weights are calculated for each sex and then averaged. NA values for length-related parameters (e.g., <code>l_mat</code>, <code>l_max</code>) indicated species for which the cooresponding weights were available without conversion. These NA values all carry through to <a href="#tbl-refs" class="quarto-xref">Table&nbsp;<span>3.2</span></a>.</p>
+<p>In <a href="#tbl-params" class="quarto-xref">Table&nbsp;<span>3.1</span></a>, the NA values for weight-related parameters (e.g., <em>w_mat</em>, <em>w_max</em>) indicate weights that are converted from lengths using the <em>a</em> and <em>b</em> parameters. NA values for <em>a</em> and <em>b</em> parameters indicate sexually dimorphic species. In these cases, weights are calculated for each sex and then averaged. NA values for length-related parameters (e.g., <em>l_mat</em>, <em>l_max</em>) indicate species for which the cooresponding weights were available without conversion. These NA values all carry through to <a href="#tbl-refs" class="quarto-xref">Table&nbsp;<span>3.2</span></a>.</p>
 <p>In <a href="#tbl-refs" class="quarto-xref">Table&nbsp;<span>3.2</span></a>, default indicates paramters that were estimated following the <a href="https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full">prior</a> methodology:</p>
 <ul>
-<li><code>w_min</code>: all teleosts enter at 1 mg</li>
-<li><code>R_max</code>: scaled from maximum body size as 10<sup>11</sup> <span class="math inline">\(\times\)</span> <em>w<sub>max</sub></em><sup>-1.5</sup> (<span class="citation" data-cites="Blanchard2014">Blanchard et al. (<a href="references.html#ref-Blanchard2014" role="doc-biblioref">2014</a>)</span>)</li>
-<li><code>w_min</code>: species’ minimum depth is 0 m in the absence of evidence to the contrary</li>
+<li><em>w_min</em>: all teleosts enter at 1 mg</li>
+<li><em>R_max</em>: scaled from maximum body size as 10<sup>11</sup> <span class="math inline">\(\times\)</span> <em>w<sub>max</sub></em><sup>-1.5</sup> (<span class="citation" data-cites="Blanchard2014">Blanchard et al. (<a href="references.html#ref-Blanchard2014" role="doc-biblioref">2014</a>)</span>)</li>
+<li><em>w_min</em>: species’ minimum depth is 0 m in the absence of evidence to the contrary</li>
 </ul>
-<p>Each species’ minimum and maximum depths (<code>depth_min</code> and <code>depth_max</code>, respectively) were used by a <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/Build_interaction_matrix.Rmd">script</a> to build the interaction matrix (<a href="#tbl-inter" class="quarto-xref">Table&nbsp;<span>3.3</span></a>) based on vertical overlap (see the <a href="https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full">original model</a> for more details). These depth ranges were typical depth ranges, not record observations, because we want species’ routine overlap.</p>
+<p>Each species’ minimum and maximum depths (<em>depth_min</em> and <em>depth_max</em>, respectively) were used by a <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/Build_interaction_matrix.Rmd">script</a> to build the interaction matrix (<a href="#tbl-inter" class="quarto-xref">Table&nbsp;<span>3.3</span></a>) based on vertical overlap (see the <a href="https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full">original model</a> for more details). These depth ranges were typical depth ranges, not record observations, because we want species’ routine overlap.</p>
 <div class="cell">
 <div id="tbl-params" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
