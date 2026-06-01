@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Pelagic mizer model",
     "section": "",
-    "text": "Overview\nThe model presented here is an updated version of that used in Woodworth-Jefcoats, Blanchard, and Drazen (2019). This updated version:\nTo get the most out of this site, it’s recommended that you also visit the linked RMarkdown scripts in the accompanying repo.",
+    "text": "Overview\nThe model presented here is an updated version of that used in Woodworth-Jefcoats, Blanchard, and Drazen (2019). This updated version:\nThis model is a tool meant to generally capture the Hawaiʻi-based longline fisheries and the dynamics of the ecosystem supporting them in a manner that allows for simulation testing. It is designed to complement assessments, not substitute for them.\nTo get the most out of this site, it’s recommended that you also visit the linked RMarkdown scripts in the accompanying repo.",
     "crumbs": [
       "Overview"
     ]
@@ -14,7 +14,7 @@
     "href": "index.html#overview",
     "title": "Pelagic mizer model",
     "section": "",
-    "text": "includes additional species,\nexplicitly represents both the deep-set and shallow-set fisheries, and\nmakes use of updated mizer capabilities.",
+    "text": "includes additional species,\nhas updated species parameters where new information was found,\nexplicitly represents both the deep-set and shallow-set fisheries, and\nmakes use of updated mizer capabilities.",
     "crumbs": [
       "Overview"
     ]
