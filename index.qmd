@@ -4,8 +4,14 @@ The model presented here is an updated version of that used in @WoodworthJefcoat
 This updated version:  
 
 * includes additional species,
+* has updated species parameters where new information was found,
 * explicitly represents both the deep-set and shallow-set fisheries, and
 * makes use of updated [mizer](https://sizespectrum.org/mizer/) capabilities.
+
+This model is a tool meant to generally capture the Hawaiʻi-based longline 
+fisheries and the dynamics of the ecosystem supporting them in a manner that 
+allows for simulation testing. It is designed to complement assessments, not 
+substitute for them.  
 
 To get the most out of this site, it's recommended that you also visit the 
 linked RMarkdown scripts in the [accompanying repo](https://github.com/noaa-pifsc/Pelagic-mizer-model).
