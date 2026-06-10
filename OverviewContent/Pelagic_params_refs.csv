@@ -1,0 +1,19 @@
+species,w_max,w_mat,age_mat,w_min,R_max,depth_min,depth_max,beta,sigma,a,b,l_min,l_mat,l_max,catchability
+Lancetfish,NA,"@Gibbs1960, @Uchiyama2003","@Thorson2023, ExpertOpinion",default,default,default,@Portner2017,@Barnes2008,@Barnes2008,@Uchiyama2003,@Uchiyama2003,NA,NA,@Portner2017,default
+BigeyeTuna,@Uchiyama2003,NA,@Farley2018,default,default,default,@Howell2010,@Barnes2008,@Barnes2008,@Bigelow2012,@Bigelow2012,NA,@Huang2023,NA,@Day2023
+BlueShark,@ISC2017,@ISC2022,@ISC2022,@ISC2022,default,default,@Stevens2010,@Barnes2008,@Barnes2008,NA,NA,NA,NA,NA,@ISC2022
+MahiMahi,@Uchiyama2006,"@AlejoPlata2011, @Uchiyama2003",@Perrichon2019,default,default,default,@FishBase2026,@Barnes2008,@Barnes2008,@Uchiyama2006,@Uchiyama2006,NA,NA,NA,default
+Swordfish,@DeMartini2007,"@DeMartini2000, @DeMartini2007","@DeMartini2000, @DeMartini2007",default,default,default,@Abecassis2012,@Barnes2008,@Barnes2008,@DeMartini2007,@DeMartini2007,NA,NA,NA,@BillfishWG2023
+YellowfinTuna,@Uchiyama2003,NA,@Magnusson2023,default,default,default,"@Lam2020, @Schaefer2011",@Barnes2008,@Barnes2008,@Uchiyama2003,@Uchiyama2003,NA,"@Itano2000, @Magnusson2023",NA,"@Magnusson2023, @MinteVera2020"
+SkipjackTuna,@Uchiyama2003,NA,@Teears2025,default,default,default,@Schaefer2007,@Barnes2008,@Barnes2008,@Uchiyama2003,@Uchiyama2003,NA,@Jordan2022,NA,@Teears2025
+AlbacoreTuna,@Uchiyama2003,NA,@AlbacoreWG2023,default,default,default,"@Williams2015, @Duffy2017","@Barnes2008, @Pinnegar2015, @Goni2014","@Barnes2008, @Pinnegar2015, @Goni2014","@Curran2016, @Uchiyama2003","@Curran2016, @Uchiyama2003",NA,@AlbacoreWG2023,NA,@AlbacoreWG2023
+StripedMarlin,NA,NA,@BillfishWG,default,default,default,"@FishBase2026, @Sipple2007",@Barnes2008,@Barnes2008,@BillfishWG,@BillfishWG,NA,@BillfishWG,@BillfishWG,@BillfishWG
+Wahoo,NA,NA,"@Zischke2013RFBF, @MakiJenkins2009, @Kindong2022",default,default,default,"@FishBase2026, @Sepulveda2011",@Barnes2008,@Barnes2008,@Uchiyama2006,@Uchiyama2006,NA,"@BrownPeterson2000, @Viana2013, @Zischke2013RFBF","@Viana2013, @Zischke2013ICES, @Kindong2022, @Oyafuso2016, @McBride2008",default
+Opah,@Hawn2012,"@Sundberg2011, @Francis2004",@Francis2004,default,default,@Polovina2008,@Polovina2008,@Barnes2008,@Barnes2008,NA,NA,NA,NA,NA,default
+BlueMarlin,@Uchiyama2003,@BillfishWG2021,@BillfishWG2021,default,default,default,@Holland1990,@Barnes2008,@Barnes2008,NA,NA,NA,NA,NA,@BillfishWG2021
+ShortfinMakoShark,"@Mako2024a, @Mako2024r","@Mako2024a, @Mako2024r",@Mako2024a,@CZ2018,default,default,@NL2019,@Barnes2008,@Barnes2008,NA,NA,NA,NA,NA,@Mako2024a
+Pomfret,default,NA,ExpertOpinion,default,default,@Gray2016,@Gray2016,@Barnes2008,@Barnes2008,@Curran2016,@Curran2016,NA,@Bigelow1995,NA,default
+ShortbillSpearfish,@Uchiyama2003,NA,@Thorson2023,default,default,default,@Shimose2010,@Barnes2008,@Barnes2008,@Uchiyama2003,@Uchiyama2003,NA,@Molony2008,NA,default
+OceanicWhitetipShark,NA,NA,"@Joung2016, @TremblayBoyer2019",NA,default,default,"@Joung2020, @TremblayBoyer2019",@Barnes2008,@Barnes2008,@Joung2016,@Joung2016,"@Seki1998, @Joung2016, @DAlberto2017, @Young2020","@Joung2016, @TremblayBoyer2019",@TremblayBoyer2019,@Neubauer2025
+SnakeMackerel,@Uchiyama2003,NA,@Thorson2023,default,default,default,"@Oyafuso2016, @Choy2013",@Barnes2008,@Barnes2008,@Uchiyama2003,@Uchiyama2003,NA,"@Thorson2023, @FishBase2026",NA,default
+Escolar,NA,NA,@Thorson2023,default,default,Default,@Choy2013,@Barnes2008,@Barnes2008,"@Sundberg2011, @Curran2016","@Sundberg2011, @Curran2016",NA,Estimated,@Sundberg2011,default
