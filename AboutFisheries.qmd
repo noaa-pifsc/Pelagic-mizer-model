@@ -16,7 +16,7 @@ spatial footprints, as seen in @fig-1.  Broadly, the longline fishery fishes in
 an area roughly bounded by the dateline, the 15$\degree$C sea surface temperature
 isotherm (@WOAtemp), the western edge of the US EEZ off California, and low-oxygen waters
 in the eastern tropical Pacific (which we define as waters within 200 m of the
-surface having less than 2 ml l^-^^1^ O~2~; @WOAoxygen).
+surface having less than 2.1 ml l^-^^1^ O~2~; @WOAoxygen).
 
 ![Map of fishery domains and influential oceanographic features](OverviewContent/domain_map.png){#fig-1
 alt="a map of the Pacific Ocean with polygons for fishing area and boundaries described in the text"}
