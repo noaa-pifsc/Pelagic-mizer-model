@@ -2,7 +2,7 @@
 
 This model is built to capture the Hawaiʻi-based longline fishery, which is 
 actually two fisheries: a tuna fishery and a swordfish fishery.  The tuna 
-fishery targets bigeye tuna (*Thunnus obsesus*) and is often referred to as the
+fishery targets bigeye tuna (*Thunnus obesus*) and is often referred to as the
 "deep-set fishery" because it sets its hooks deeper in the water column 
 (100--400 m) to capture bigeye tuna when they're foraging at depth during the
 daytime (@Bigelow2006).  As the name suggests, the swordfish fishery targets 

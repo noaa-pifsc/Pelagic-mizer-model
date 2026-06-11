@@ -34,7 +34,7 @@ Selectivity *(S)* was informed by observer data (see @sec-AboutData).  We used
 and set *sigmoidal_weight* to the smallest size that experiences at least 25%
 as much catch (in number of fish caught) at the size that sees the greatest 
 catch and *sigmoidal_sigma* as the number of size classes that experience at
-least 1% as much catch as the size the sees the greatest catch. An example of 
+least 1% as much catch as the size that sees the greatest catch. An example of 
 these values for bigeye tuna are shown in @fig-S below.  When determining
 these values, we binned sizes to match those used in our mizer model (see 
 @sec-RunningMizer).  You can view our code for identifying these values
