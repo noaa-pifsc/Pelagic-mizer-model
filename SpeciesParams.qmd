@@ -40,6 +40,10 @@ to build the interaction matrix (@tbl-inter) based on vertical overlap (see the
 for more details).  These depth ranges were typical depth ranges, not record
 observations, because we want species' routine overlap.  
 
+Note that both pomfret and escolar are species complexes due to changes in 
+observer reporting over time.  We leaned towards drawing upon references for the
+dominant species in each group wherever possible.
+
 ```{r}
 #| echo: false
 #| message: false
