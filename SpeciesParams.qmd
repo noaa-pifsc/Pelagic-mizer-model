@@ -22,10 +22,10 @@ In @tbl-params, the NA values for weight-related parameters (e.g., *w_mat*,
 parameters.  NA values for *a* and *b* parameters indicate sexually dimorphic
 species.  In these cases, weights are calculated for each sex and then averaged.
 NA values for length-related parameters (e.g., *l_mat*, *l_max*) indicate 
-species for which the cooresponding weights were available without conversion. 
+species for which the corresponding weights were available without conversion. 
 These NA values all carry through to @tbl-refs.
 
-In @tbl-refs, default indicates paramters that were estimated following the 
+In @tbl-refs, default indicates parameters that were estimated following the 
 [prior](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full)
 methodology: 
 
