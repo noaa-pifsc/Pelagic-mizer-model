@@ -8,7 +8,7 @@ the build process to identify challenges and access parameters.  For example,
 when binning observed catch-at-size (see @sec-FishingParams), we had to run 
 mizer in order to extract the size bins.  All this is to say, while we present 
 things here as a straightforward unidirectional workflow, know that building and 
-working with your own model will be interative.
+working with your own model will be iterative.
 
 [Mizer](https://sizespectrum.org/mizer/) runs in [R](https://www.r-project.org/).
 We recommend using [RStudio](https://posit.co/products/open-source/rstudio) or
@@ -78,7 +78,10 @@ Notice that we received a message about some assumptions the model made based on
 the information we did and didn't give it.  This step created a full set of 
 parameters that mizer will use to run simulations.  To look at the species 
 parameters, for example, use `pelagic_params@species_params`.  You can use 
-similar syntax to take a look at the other parameters.  
+similar syntax to take a look at the other parameters.  The 
+[mizer site](https://sizespectrum.org/mizer/index.html) offers extensive 
+descriptions of the parameters and discusses this function in detail.  It's 
+worth reading carefully to better understand this step.
 
 The next step is to run the model to a steady state:
 ```{r}
