@@ -44,10 +44,13 @@ book:
 
 
 bibliography: references.bib
+csl: apa.csl
 
 prefer-html: true
 format:
   html:
+    link-external-icon: true
+    link-external-newwindow: true
     toc: true
     toc-depth: 5
     theme: 
