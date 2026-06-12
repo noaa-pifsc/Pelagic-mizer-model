@@ -201,7 +201,7 @@ ul.task-list li input[type="checkbox"] {
 
 <p>The previous sections present the final parameters that we settled on after much work and adjusting. The process by which these came together involved quite a bit of iteration, particularly setting the selectivity parameters.</p>
 <p>We have elected to fit our modeled catch-at-size to observed catch-at-size. This is the best, most comprehensive information we have about the system we’re modeling. While this approach doesn’t quite fit the bill for validation, it’s the best we can do with what we have and offers a reasonable calibration approach.</p>
-<p>Figures <a href="#fig-calval-deep" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> and <a href="#fig-calval-shal" class="quarto-xref">Figure&nbsp;<span>5.2</span></a> below show a variety of selectivity parameter permutations we tested and their resulting significant (<em>p</em> &lt; 0.05) correlation coefficients. Modeled and observed catch-at-size was compared and figures were generated with <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/FisheryData/CatchComparison.Rmd">this code</a>.</p>
+<p>Figures <a href="#fig-calval-deep" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> and <a href="#fig-calval-shal" class="quarto-xref">Figure&nbsp;<span>5.2</span></a> below show a variety of selectivity parameter permutations we tested and their resulting significant (<em>p</em> &lt; 0.05) correlation coefficients. Modeled and observed catch-at-size was compared and figures were generated with <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/FisheryData/CatchComparison.Rmd">this code</a>. Black lines represent observed catch at size (with circles used for sharks because their lengths are reported in feet rather than cm, which leads to otherwise blocky plots). Colors represent different parameter choices as described below the figures.</p>
 <p>In addition to trialing different thresholds for <em>sigmoidal_weight</em> and <em>sigmoidal_sigma</em> we also tested several values for <em>kappa</em> which is a parameter that informs initial abundances. In the end, we kept the default value (10<sup>11</sup>) because it resulted in catch magnitudes that most closely matched observed catch.</p>
 <p>We also changed the following default parameters:</p>
 <ul>
@@ -351,6 +351,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

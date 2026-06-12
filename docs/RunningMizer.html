@@ -242,7 +242,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This section walks you through running <a href="https://sizespectrum.org/mizer/">mizer</a> using the parameters <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model">provided</a> for Hawaiʻi-based longline fisheries. We note that when building the model as described in the previous sections it was necessary to run the model throughout the build process to identify challenges and access parameters. For example, when binning observed catch-at-size (see <a href="FishingParams.html" class="quarto-xref"><span>Chapter 4</span></a>), we had to run mizer in order to extract the size bins. All this is to say, while we present things here as a straightforward unidirectional workflow, know that building and working with your own model will be interative.</p>
+<p>This section walks you through running <a href="https://sizespectrum.org/mizer/">mizer</a> using the parameters <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model">provided</a> for Hawaiʻi-based longline fisheries. We note that when building the model as described in the previous sections it was necessary to run the model throughout the build process to identify challenges and access parameters. For example, when binning observed catch-at-size (see <a href="FishingParams.html" class="quarto-xref"><span>Chapter 4</span></a>), we had to run mizer in order to extract the size bins. All this is to say, while we present things here as a straightforward unidirectional workflow, know that building and working with your own model will be iterative.</p>
 <p><a href="https://sizespectrum.org/mizer/">Mizer</a> runs in <a href="https://www.r-project.org/">R</a>. We recommend using <a href="https://posit.co/products/open-source/rstudio">RStudio</a> or a similar platform, simply for ease of use.</p>
 <p>If you haven’t already, install <a href="https://sizespectrum.org/mizer/">mizer</a>:</p>
 <div class="cell">
@@ -292,7 +292,7 @@ Using z0 = z0pre * w_max ^ z0exp for missing z0 values.
 Using f0, h, lambda, kappa and the predation kernel to calculate gamma.</code></pre>
 </div>
 </div>
-<p>Notice that we received a message about some assumptions the model made based on the information we did and didn’t give it. This step created a full set of parameters that mizer will use to run simulations. To look at the species parameters, for example, use <code>pelagic_params@species_params</code>. You can use similar syntax to take a look at the other parameters.</p>
+<p>Notice that we received a message about some assumptions the model made based on the information we did and didn’t give it. This step created a full set of parameters that mizer will use to run simulations. To look at the species parameters, for example, use <code>pelagic_params@species_params</code>. You can use similar syntax to take a look at the other parameters. The <a href="https://sizespectrum.org/mizer/index.html">mizer site</a> offers extensive descriptions of the parameters and discusses this function in detail. It’s worth reading carefully to better understand this step.</p>
 <p>The next step is to run the model to a steady state:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pelagic_steady <span class="ot">&lt;-</span> <span class="fu">steady</span>(pelagic_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -444,6 +444,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

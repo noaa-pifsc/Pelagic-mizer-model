@@ -302,7 +302,7 @@ window.Quarto = {
 </header>
 
 
-<p>The model presented here offers an improvement over <span class="citation" data-cites="WoodworthJefcoats2019">Woodworth-Jefcoats, Blanchard, and Drazen (<a href="references.html#ref-WoodworthJefcoats2019" role="doc-biblioref">2019</a>)</span> in that it:</p>
+<p>The model presented here offers an improvement over <span class="citation" data-cites="WoodworthJefcoats2019">Woodworth-Jefcoats et al. (<a href="references.html#ref-WoodworthJefcoats2019" role="doc-biblioref">2019</a>)</span> in that it:</p>
 <ul>
 <li>includes six additional species,</li>
 <li>models the shallow-set swordfish fishery, and</li>
@@ -326,11 +326,7 @@ Figure&nbsp;6.1: Steady state biomass spectra
 </div>
 </div>
 <p>The likeliest reason for this behavior is that these species don’t experience enough predation mortality. These four species have the smallest total interaction with other species (<a href="SpeciesParams.html#tbl-inter" class="quarto-xref">Table&nbsp;<span>3.3</span></a>) by virtue of their depth range parameters (<a href="SpeciesParams.html#tbl-params" class="quarto-xref">Table&nbsp;<span>3.1</span></a>). One way to address this would be to increase external mortality for these four species. In mizer, external mortality covers all sources of mortality that aren’t explicitly modeled: predation by species that aren’t included (e.g., cetaceans), capture by fisheries that aren’t included, disease, environmental stress, etc.</p>
-<p>In mizer, the <a href="https://sizespectrum.org/mizer/reference/newMultispeciesParams.html#setting-external-mortality-rate">default approach</a> to calculating species-specific external mortality, <span class="math inline">\(\mu\)</span>, is: <span class="math display">\[
-\begin{align}
-\mu = z0 w_{max}^{n-1}
-\end{align}
-\]</span> For our model, this is effectively: <span class="math display">\[
+<p>In mizer, the <a href="https://sizespectrum.org/mizer/reference/newMultispeciesParams.html#setting-external-mortality-rate">default approach</a> to calculating species-specific external mortality, <span class="math inline">\(\mu\)</span>, is effectively: <span class="math display">\[
 \begin{align}
 \mu = 0.6 w_{max}^{-0.25}
 \end{align}
@@ -374,7 +370,7 @@ Figure&nbsp;6.1: Steady state biomass spectra
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pelagic_params <span class="ot">&lt;-</span> <span class="fu">setExtMort</span>(pelagic_params,</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">ext_mort =</span> pelagic_external_mortality)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We found that this approached improved the fit for four species in question (<a href="#fig-improve-deep" class="quarto-xref">Figure&nbsp;<span>6.2</span></a> and <a href="#fig-improve-shallow" class="quarto-xref">Figure&nbsp;<span>6.3</span></a>). However, we haven’t included this in the workflow outlined because the approach is subjective (level of increased mortality) and species-specific and therefore might not be appropriate for all applications.</p>
+<p>We found that this approach improved the fit for four species in question (<a href="#fig-improve-deep" class="quarto-xref">Figure&nbsp;<span>6.2</span></a> and <a href="#fig-improve-shallow" class="quarto-xref">Figure&nbsp;<span>6.3</span></a>). However, we haven’t included this in the workflow outlined because the approach is subjective (level of increased mortality) and species-specific and therefore might not be appropriate for all applications.</p>
 </section>
 <section id="improving-catch-at-size" class="level2" data-number="6.2">
 <h2 data-number="6.2" class="anchored" data-anchor-id="improving-catch-at-size"><span class="header-section-number">6.2</span> Improving catch-at-size</h2>
@@ -403,7 +399,7 @@ Figure&nbsp;6.3: Comparison of observed and modeled deep-set catch at size under
 </section>
 <section id="improving-life-history-parameters" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="improving-life-history-parameters"><span class="header-section-number">6.3</span> Improving life history parameters</h2>
-<p>Because mizer is a size structured model, the parameters <em>w_mat</em> and <em>w_max</em> are particularly important. These values are used to inform processes such as reproduction and natural mortality. Confirming that there aren’t better estimates available, and updating the parameters as new science comes to light, would likely improve the model.</p>
+<p>Because mizer is a size structured model, the parameters for weight-at-maturity, <em>w_mat</em>, and maximum weight, <em>w_max</em>, are particularly important. These values are used to inform processes such as reproduction and natural mortality. Confirming that there aren’t better estimates available, and updating the parameters as new science comes to light, would likely improve the model.</p>
 </section>
 <section id="improving-predation" class="level2" data-number="6.4">
 <h2 data-number="6.4" class="anchored" data-anchor-id="improving-predation"><span class="header-section-number">6.4</span> Improving predation</h2>
@@ -420,9 +416,9 @@ Figure&nbsp;6.3: Comparison of observed and modeled deep-set catch at size under
 <p>Whether and how you improve the model depends on your application. In general, it seems prudent to go with the approach that requires the least amount of subjective adjustment yet still results in a model that’s equal to your questions.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
 <div id="ref-WoodworthJefcoats2019" class="csl-entry" role="listitem">
-Woodworth-Jefcoats, Phoebe A., Julia L. Blanchard, and Jeffrey C. Drazen. 2019. <span>“<span class="nocase">Relative Impacts of Simultaneous Stressors on a Pelagic Marine Ecosystem</span>.”</span> <em>Frontiers in Marine Science</em> 6: 383. <a href="https://doi.org/10.3389/fmars.2019.00383">https://doi.org/10.3389/fmars.2019.00383</a>.
+Woodworth-Jefcoats, P. A., Blanchard, J. L., &amp; Drazen, J. C. (2019). <span class="nocase">Relative Impacts of Simultaneous Stressors on a Pelagic Marine Ecosystem</span>. <em>Frontiers in Marine Science</em>, <em>6</em>, 383. <a href="https://doi.org/10.3389/fmars.2019.00383">https://doi.org/10.3389/fmars.2019.00383</a>
 </div>
 </div>
 </section>
@@ -532,6 +528,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

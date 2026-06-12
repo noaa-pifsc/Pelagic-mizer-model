@@ -248,7 +248,7 @@ div.csl-indent {
 
 <section id="overview" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="overview">Overview</h2>
-<p>The model presented here is an updated version of that used in <span class="citation" data-cites="WoodworthJefcoats2019">Woodworth-Jefcoats, Blanchard, and Drazen (<a href="references.html#ref-WoodworthJefcoats2019" role="doc-biblioref">2019</a>)</span>. This updated version:</p>
+<p>The model presented here is an updated version of that used in <span class="citation" data-cites="WoodworthJefcoats2019">Woodworth-Jefcoats et al. (<a href="references.html#ref-WoodworthJefcoats2019" role="doc-biblioref">2019</a>)</span>. This updated version:</p>
 <ul>
 <li>includes additional species,</li>
 <li>has updated species parameters where new information was found,</li>
@@ -271,9 +271,9 @@ div.csl-indent {
 <p>The <a href="https://pifsc-protected-species-division.github.io/PMNM-ARCamps-Manual/">PIFSC PSD field manual</a> was an inspiration and a helpful model. The <a href="https://github.com/emdelponte/epidemiology-R">R for Plant Disease Epidemiology</a> Quarto book provided a template from which to work. Thank you!!</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
 <div id="ref-WoodworthJefcoats2019" class="csl-entry" role="listitem">
-Woodworth-Jefcoats, Phoebe A., Julia L. Blanchard, and Jeffrey C. Drazen. 2019. <span>“<span class="nocase">Relative Impacts of Simultaneous Stressors on a Pelagic Marine Ecosystem</span>.”</span> <em>Frontiers in Marine Science</em> 6: 383. <a href="https://doi.org/10.3389/fmars.2019.00383">https://doi.org/10.3389/fmars.2019.00383</a>.
+Woodworth-Jefcoats, P. A., Blanchard, J. L., &amp; Drazen, J. C. (2019). <span class="nocase">Relative Impacts of Simultaneous Stressors on a Pelagic Marine Ecosystem</span>. <em>Frontiers in Marine Science</em>, <em>6</em>, 383. <a href="https://doi.org/10.3389/fmars.2019.00383">https://doi.org/10.3389/fmars.2019.00383</a>
 </div>
 </div>
 </section>
@@ -383,6 +383,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

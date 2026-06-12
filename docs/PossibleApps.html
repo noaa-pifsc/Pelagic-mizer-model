@@ -243,7 +243,7 @@ div.csl-indent {
 <section id="hindcasting-forecasting-and-projecting" class="level2" data-number="8.2">
 <h2 data-number="8.2" class="anchored" data-anchor-id="hindcasting-forecasting-and-projecting"><span class="header-section-number">8.2</span> Hindcasting, forecasting, and projecting</h2>
 <p>A handy thing about <a href="https://sizespectrum.org/mizer/">mizer</a> is that, while it was originally developed to examine the effects of fishing mortality, you can extend it to incorporate environmental effects on fish.</p>
-<p>Functionality exists to drive the background resource with either satellite remotely sensed or modeled data. We’ve added <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/tree/main/LinkingEnvironmentalData">code</a> for each of these approaches in our <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model">repository</a>. Functionality also exists to incorporate the effects of ocean temperature on fish through using the <a href="https://github.com/sizespectrum/therMizer">therMizer</a> extension. To use <a href="https://github.com/sizespectrum/therMizer">therMizer</a> you need to know or estimate species’ thermal tolerance limits and have a source of ocean temperature data.</p>
+<p>Functionality exists to drive the background resource with either satellite remotely sensed or modeled data. The background resource is essentially the plankton community and it effectively limits how much food is available to all larger body sizes (i.e., modeled fish species). We’ve added <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/tree/main/LinkingEnvironmentalData">code</a> for each of these approaches in our <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model">repository</a>. Functionality also exists to incorporate the effects of ocean temperature on fish through using the <a href="https://github.com/sizespectrum/therMizer">therMizer</a> extension. To use <a href="https://github.com/sizespectrum/therMizer">therMizer</a> you need to know or estimate species’ thermal tolerance limits and have a source of ocean temperature data. Thermal tolerance limits can be found in the literature in tagging studies and in databases like <a href="https://fishbase.org/">FishBase</a>.</p>
 <p>It could be interesting to use data about the past (empirical or modeled) to replicate past catch and, subsequently, forecast future catch. For future environmental conditions you could use climatological data or modeled seasonal forecast data. You can also use earth system model output to inform climate- based projections.</p>
 </section>
 <section id="other-sources-of-mortality" class="level2" data-number="8.3">
@@ -252,16 +252,16 @@ div.csl-indent {
 </section>
 <section id="food-limitation-and-other-ecological-theories" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="food-limitation-and-other-ecological-theories"><span class="header-section-number">8.4</span> Food limitation and other ecological theories</h2>
-<p>The results of this model are sensitive to what’s decided about food limitation. If the system isn’t food limited, then effects on the background resource will have limited effect on the fish. If the system is food limited, then effects on the background resource will have clear effects on the fish. And to some degree one has to make an assumption of food limitation to pursue some of the ideas suggested above. Because mizer is based on robust yet simple ecological theory, it is straightforward to test this and other competing assumptions. One could also use mizer to explore other theoretical ecological questions, such as the degree to which ecosystems behave like economies and vice versa (e.g., <span class="citation" data-cites="Vermeij2011">Vermeij and Leigh (<a href="references.html#ref-Vermeij2011" role="doc-biblioref">2011</a>)</span>)</p>
+<p>The results of this model are sensitive to what’s decided about food limitation. If the system isn’t food limited, then effects on the background resource will have limited effect on the fish. If the system is food limited, then effects on the background resource will have clear effects on the fish. And to some degree one has to make an assumption of food limitation to pursue some of the ideas suggested above. Because mizer is based on robust yet simple ecological theory, it is straightforward to test this and other competing assumptions. One could also use mizer to explore other theoretical ecological questions, such as the degree to which ecosystems behave like economies and vice versa (e.g., <span class="citation" data-cites="Vermeij2011">Vermeij &amp; Leigh (<a href="references.html#ref-Vermeij2011" role="doc-biblioref">2011</a>)</span>)</p>
 </section>
 <section id="sharing-your-simulations-with-others" class="level2" data-number="8.5">
 <h2 data-number="8.5" class="anchored" data-anchor-id="sharing-your-simulations-with-others"><span class="header-section-number">8.5</span> Sharing your simulations with others</h2>
 <p>If you make use of our model, please <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/issues">open an issue</a> and let us know. We can add a section on applications and publications to allow modelers to connect and learn from one another.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
 <div id="ref-Vermeij2011" class="csl-entry" role="listitem">
-Vermeij, Geerat J., and Egbert G. Leigh. 2011. <span>“<span class="nocase">Natural and human economies compared</span>.”</span> <em>Ecosphere</em> 2 (4): 1–16. <a href="https://doi.org/10.1890/es11-00004.1">https://doi.org/10.1890/es11-00004.1</a>.
+Vermeij, G. J., &amp; Leigh, E. G. (2011). <span class="nocase">Natural and human economies compared</span>. <em>Ecosphere</em>, <em>2</em>(4), 1–16. <a href="https://doi.org/10.1890/es11-00004.1">https://doi.org/10.1890/es11-00004.1</a>
 </div>
 </div>
 </section>
@@ -371,6 +371,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

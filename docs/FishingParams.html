@@ -249,7 +249,7 @@ F_i = S_{g,i,w} \times Q_{g,i} \times E_g
 <li><code>ShallowSet</code> Effort: 0.015</li>
 </ul>
 <p>Catchability <em>(Q)</em> is specific to both gear and species. To approximate this as best we can, we use the fishing mortality estimates from stock assessments in place of catchability, applying them equally to both gears. When multiplied by effort <em>(E)</em> and summed across gears <em>(g)</em>, this results in fishing mortality <em>(F)</em> that’s equal to the assessment estimates. For unassessed species, we use a default value of <em>Q</em> = 0.2. See <a href="SpeciesParams.html#tbl-params" class="quarto-xref">Table&nbsp;<span>3.1</span></a> and <a href="SpeciesParams.html#tbl-refs" class="quarto-xref">Table&nbsp;<span>3.2</span></a> in <a href="SpeciesParams.html" class="quarto-xref"><span>Chapter 3</span></a> for estimates and their sources.</p>
-<p>Selectivity <em>(S)</em> was informed by observer data (see <a href="AboutData.html" class="quarto-xref"><span>Chapter 2</span></a>). We used <a href="https://sizespectrum.org/mizer/">mizer’s</a> <code>sigmoid_weight</code> selectivity function and set <em>sigmoidal_weight</em> to the smallest size that experiences at least 25% as much catch (in number of fish caught) at the size that sees the greatest catch and <em>sigmoidal_sigma</em> as the number of size classes that experience at least 1% as much catch as the size the sees the greatest catch. An example of these values for bigeye tuna are shown in <a href="#fig-S" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> below. When determining these values, we binned sizes to match those used in our mizer model (see <a href="RunningMizer.html" class="quarto-xref"><span>Chapter 7</span></a>). You can view our code for identifying these values <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/FisheryData/CatchSpectra.Rmd">here</a>.</p>
+<p>Selectivity <em>(S)</em> was informed by observer data (see <a href="AboutData.html" class="quarto-xref"><span>Chapter 2</span></a>). We used <a href="https://sizespectrum.org/mizer/">mizer’s</a> <code>sigmoid_weight</code> selectivity function and set <em>sigmoidal_weight</em> to the smallest size that experiences at least 25% as much catch (in number of fish caught) at the size that sees the greatest catch and <em>sigmoidal_sigma</em> as the number of size classes that experience at least 1% as much catch as the size that sees the greatest catch. An example of these values for bigeye tuna are shown in <a href="#fig-S" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> below. When determining these values, we binned sizes to match those used in our mizer model (see <a href="RunningMizer.html" class="quarto-xref"><span>Chapter 7</span></a>). You can view our code for identifying these values <a href="https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/FisheryData/CatchSpectra.Rmd">here</a>.</p>
 <p>Fishing-related parameters, or as <a href="https://sizespectrum.org/mizer/">mizer</a> calls them, gear parameters, are summarized in <a href="#tbl-gear" class="quarto-xref">Table&nbsp;<span>4.1</span></a>. Species-specific fishing mortality at size is presented in <a href="#fig-F" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> below.</p>
 <div id="fig-S" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -743,6 +743,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         if (link.dataset.originalHref !== undefined) {
           link.href = link.dataset.originalHref;
         }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
       }
     }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
