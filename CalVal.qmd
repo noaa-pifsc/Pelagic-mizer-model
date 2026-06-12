@@ -14,6 +14,10 @@ Figures @fig-calval-deep and @fig-calval-shal below show a variety of
 selectivity parameter permutations we tested and their resulting significant
 (*p* < 0.05) correlation coefficients.  Modeled and observed catch-at-size was
 compared and figures were generated with [this code](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/FisheryData/CatchComparison.Rmd).
+Black lines represent observed catch at size (with circles used for sharks 
+because their lengths are reported in feet rather than cm, which leads to 
+otherwise blocky plots).  Colors represent different parameter choices as 
+described below the figures.
 
 In addition to trialing different thresholds for *sigmoidal_weight* and 
 *sigmoidal_sigma* we also tested several values for *kappa* which is a 
