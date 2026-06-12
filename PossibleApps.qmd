@@ -30,7 +30,9 @@ was originally developed to examine the effects of fishing mortality, you can
 extend it to incorporate environmental effects on fish.  
 
 Functionality exists to drive the background resource with either satellite
-remotely sensed or modeled data.  We've added 
+remotely sensed or modeled data.  The background resource is essentially the
+plankton community and it effectively limits how much food is available to all
+larger body sizes (i.e., modeled fish species).  We've added 
 [code](https://github.com/noaa-pifsc/Pelagic-mizer-model/tree/main/LinkingEnvironmentalData) 
 for each of these approaches
 in our [repository](https://github.com/noaa-pifsc/Pelagic-mizer-model). 
@@ -38,7 +40,8 @@ Functionality also exists to incorporate the effects of ocean temperature on
 fish through using the [therMizer](https://github.com/sizespectrum/therMizer) 
 extension.  To use [therMizer](https://github.com/sizespectrum/therMizer) you 
 need to know or estimate species' thermal tolerance limits and have a source of 
-ocean temperature data.  
+ocean temperature data.  Thermal tolerance limits can be found in the literature
+in tagging studies and in databases like [FishBase](https://fishbase.org/).
 
 It could be interesting to use data about the past (empirical or modeled) to 
 replicate past catch and, subsequently, forecast future catch.  For future 
