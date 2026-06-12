@@ -38,11 +38,57 @@ respectively) were used by a [script](https://github.com/noaa-pifsc/Pelagic-mize
 to build the interaction matrix (@tbl-inter) based on vertical overlap (see the 
 [original model](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full)
 for more details).  These depth ranges were typical depth ranges, not record
-observations, because we want species' routine overlap.  
+observations, because we want species' typical overlap.  
+
+We include the following species in our model:  
+
+* Lancetfish (*Alepisaurus ferox*)
+* Bigeye Tuna (*Thunnus obesus*)
+* Blue Shark (*Prionace glauca*)
+* Mahi Mahi (*Coryphaena hippurus*)
+* Swordfish (*Xiphiaus gladius*)
+* Yellowfin Tuna (*Thunnus albacares*) 
+* Skipjack Tuna (*Katsuwonus pelamis*)
+* Albacore Tuna (*Thunnus alalunga*)
+* Striped Marlin (*Kajikia audax*)
+* Wahoo (*Acanthocybium solandri*)
+* Opah (*Lampris guttatus*)
+* Blue Marlin (*Makaira nigricans*)
+* Shortfin Mako Shark (*Isurus oxyrinchus*)
+* Pomfret (species complex, see below)
+* Shortbill Spearfish (*Tetrapturus angustirostris*)
+* Oceanic Whitetip Shark (*Carcharhinus longimanus*)
+* Snake Mackerel (*Gempylus serpens*)
+* Escolar (species complex, see below)
 
 Note that both pomfret and escolar are species complexes due to changes in 
 observer reporting over time.  We leaned towards drawing upon references for the
 dominant species in each group wherever possible.
+
+We used the following species parameters:
+
+* *species*: names for each species in the model, keep these in the same order
+across all your code and data
+* *w_max*: maximum mass in grams for each species, generally observed maximum 
+rather than asymptotic
+* *w_mat*: mass in grams at maturity, we use $W_{50}$
+* *age_mat*: age in years at maturity
+* *w_min*: minimum mass in grams
+* *R_max*: maximum reproduction rate
+* *depth_min*: typical minimum depth in meters
+* *depth_max*: typical maximum depth in meters
+* *beta*: preferred predator-prey mass ratio
+* *sigma*: width of the lognormal feeding kernel	
+* *a*: length-weight conversion factor, used as $W = aL^b$
+* *b*:  length-weight conversion factor, used as $W = aL^b$
+* *l_min*: minimum length in cm
+* *l_mat*: length at maturity, we use $L_{50}$
+* *l_max*: maximum length in cm, generally observed maximum rather than 
+asymptotic
+* *catchability*: see @sec-FishingParams  
+
+See the [mizer site](https://sizespectrum.org/mizer/) for further details and 
+additional parameters.
 
 ```{r}
 #| echo: false
