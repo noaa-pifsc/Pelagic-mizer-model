@@ -60,13 +60,7 @@ predation by species that aren't included (e.g., cetaceans), capture by
 fisheries that aren't included, disease, environmental stress, etc.
 
 In mizer, the [default approach](https://sizespectrum.org/mizer/reference/newMultispeciesParams.html#setting-external-mortality-rate) 
-to calculating species-specific external mortality, $\mu$, is: 
-$$
-\begin{align}
-\mu = z0 w_{max}^{n-1}
-\end{align}
-$$
-For our model, this is effectively:
+to calculating species-specific external mortality, $\mu$, is effectively:
 $$
 \begin{align}
 \mu = 0.6 w_{max}^{-0.25}
@@ -119,7 +113,7 @@ pelagic_params <- setExtMort(pelagic_params,
                              ext_mort = pelagic_external_mortality)
 ```
 
-We found that this approached improved the fit for four species in question 
+We found that this approach improved the fit for four species in question 
 (@fig-improve-deep and @fig-improve-shallow).  However, we haven't included 
 this in the workflow outlined because the approach is subjective (level of 
 increased mortality) and species-specific and therefore might not be appropriate 
@@ -147,11 +141,12 @@ think about when considering @sec-Possibilities.
 
 ## Improving life history parameters
 
-Because mizer is a size structured model, the parameters *w_mat* and *w_max* are
-particularly important.  These values are used to inform processes such as 
-reproduction and natural mortality.  Confirming that there aren't better 
-estimates available, and updating the parameters as new science comes to light,
-would likely improve the model.  
+Because mizer is a size structured model, the parameters for weight-at-maturity,
+*w_mat*, and maximum weight, *w_max*, are particularly important.  These values 
+are used to inform processes such as reproduction and natural 
+mortality.  Confirming that there aren't better estimates available, and 
+updating the parameters as new science comes to light, would likely improve the 
+model.  
 
 ## Improving predation
 
