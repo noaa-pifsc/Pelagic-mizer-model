@@ -154,7 +154,7 @@ The species in this model are nearly all apex predators.  The limited diet
 studies available suggest that they primarily eat species other than each other. 
 For this reason, we extend the background resource for the full size range of 
 fish modeled.  As a result, most of the predation is of the background resource.
-While this is probably realisitic, it does mean that there's very little in the
+While this is probably realistic, it does mean that there's very little in the
 model in the way of predator-prey interactions.  Changing one species has 
 little effect on other species. This could be changed by rethinking how
 predation is modeled. For example, the maximum size of the background resource
