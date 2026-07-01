@@ -1,4 +1,4 @@
-# Calibration/Validation {#sec-CalVal}
+# Calibration and Diagnostic Evaluation {#sec-CalVal}
 
 The previous sections present the final parameters that we settled on after 
 much work and adjusting.  The process by which these came together involved 
