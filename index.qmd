@@ -7,6 +7,7 @@ This updated version:
 * has updated species parameters where new information was found,
 * explicitly represents both the deep-set and shallow-set fisheries, and
 * makes use of updated [mizer](https://sizespectrum.org/mizer/) capabilities.
+We use mizer version 3.0.0.
 
 This model is a tool meant to generally capture the Hawaiʻi-based longline 
 fisheries and the dynamics of the ecosystem supporting them in a manner that 
