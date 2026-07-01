@@ -23,11 +23,13 @@ pooled (see @sec-AboutData):
 
 Catchability *(Q)* is specific to both gear and species.  To approximate this as
 best we can, we use the fishing mortality estimates from stock assessments in
-place of catchability, applying them equally to both gears.  When multiplied by 
-effort *(E)* and summed across gears *(g)*, this results in fishing mortality
-*(F)* that's equal to the assessment estimates.  For unassessed species, we
-use a default value of *Q* = 0.2.  See @tbl-params and @tbl-refs in @sec-SpeciesParams
-for estimates and their sources. 
+place of catchability, applying them equally to both gears.  When assessments 
+provided time-varying estimates, we averaged across time (time series) or chose 
+the block of time most representative of the period covered by our data (time 
+blocks).  When multiplied by effort *(E)* and summed across gears *(g)*, this 
+results in fishing mortality *(F)* that's equal to the assessment estimates.  For 
+unassessed species, we use a default value of *Q* = 0.2.  See @tbl-params and 
+@tbl-refs in @sec-SpeciesParams for estimates and their sources. 
 
 Selectivity *(S)* was informed by observer data (see @sec-AboutData).  We used
 [mizer's](https://sizespectrum.org/mizer/) `sigmoid_weight` selectivity function
