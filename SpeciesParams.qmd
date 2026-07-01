@@ -87,8 +87,9 @@ rather than asymptotic
 asymptotic
 * *catchability*: see @sec-FishingParams  
 
-See the [mizer site](https://sizespectrum.org/mizer/) for further details and 
-additional parameters.
+Note that this list of parameters doesn't exactly match those used during in the 
+[prior](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full)
+model due to updates to the mizer model itself. See the [mizer site](https://sizespectrum.org/mizer/) for further details and additional parameters.
 
 ```{r}
 #| echo: false
