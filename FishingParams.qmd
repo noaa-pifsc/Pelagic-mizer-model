@@ -52,6 +52,7 @@ alt="a line plot showing that bigeye tuna catch peaks at about 30 kg, sigmoidal_
 ```{r}
 #| echo: false
 #| message: false
+#| warning: false
 #| label: tbl-gear
 #| tbl-cap: Gear parameters
 
@@ -71,6 +72,7 @@ kable(gear_params)
 ```{r}
 #| echo: false
 #| message: false
+#| warning: false
 #| label: fig-F
 #| fig-cap: Species- and size-specific fishing mortality as parameterized in our mizer model
 #| fig-alt: line plots showing that catch is greatest for the largest sizes of each species and that these values match assessment estimates

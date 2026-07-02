@@ -93,6 +93,7 @@ model due to updates to the mizer model itself. See the [mizer site](https://siz
 
 ```{r}
 #| echo: false
+#| warning: false
 #| message: false
 #| label: tbl-params
 #| tbl-cap: Species parameters provided to mizer for this model

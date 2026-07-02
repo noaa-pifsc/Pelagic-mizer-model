@@ -21,6 +21,7 @@ this in @fig-spectra below.  It may help to zoom in and reposition the figure.
 ```{r}
 #| echo: false
 #| message: false
+#| warning: false
 #| label: fig-spectra
 #| fig-cap: Steady state biomass spectra
 #| fig-alt: Biomass spectra that behave as expected except for the four species discussed
