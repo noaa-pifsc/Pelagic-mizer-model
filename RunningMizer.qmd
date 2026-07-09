@@ -21,6 +21,9 @@ install.packages("mizer")
 
 Load the package into your R session:
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 library(mizer) 
 ```
 
@@ -34,9 +37,13 @@ install.packages("here")
 
 Load them:
 ```{r, message = FALSE}
+
 library(tidyverse, quietly = TRUE) 
 library(here) 
+
 ```
+
+
 
 Next up, you'll need to load the parameter files and interaction matrix.  The
 code here assumes that you've set up an R project that matches the structure of
