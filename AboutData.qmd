@@ -37,7 +37,11 @@ this species).  For the remaining species, filtered data were grouped to
 identify generic values for teleosts and sharks.  Data for albacore tuna from 
 @Barnes2008 were [combined](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/DietData/AlbacoreDietData.Rmd) 
 with albacore tuna diet data from @Pinnegar2015 and @Goni2014.  These data 
-informed feeding kernel parameters.
+informed feeding kernel parameters.  We note that all species used here would
+benefit from the availability of regional diet data.  Further, species not 
+listed above would benefit from species-specific diet data from any region.  To
+be maximally useful in mizer, these diet data would include species-specific 
+predator and prey masses.
 
 Information for remaining parameters was taken from the literature (see @sec-SpeciesParams).
 When data for needed parameters wasn't in the literature, we turned to [FishLife](https://james-thorson-noaa.github.io/FishLife/)
