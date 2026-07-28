@@ -33,8 +33,11 @@ methodology:
 * *R_max*: scaled from maximum body size as 10^11^ $\times$ *w~max~*^-1.5^ (@Blanchard2014) 
 * *w_min*: species' minimum depth is 0 m in the absence of evidence to the contrary
 
-Each species' minimum and maximum depths (*depth_min* and *depth_max*, 
-respectively) were used by a [script](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/Build_interaction_matrix.Rmd)
+Expert Opinion notes rare instances when insufficient data were available in the
+literature and the authors used their best judgement based on information 
+available for similar species and/or life history parameters.  Each species' 
+minimum and maximum depths (*depth_min* and *depth_max*, respectively) were used 
+by a [script](https://github.com/noaa-pifsc/Pelagic-mizer-model/blob/main/ModelBuild/Build_interaction_matrix.Rmd)
 to build the interaction matrix (@tbl-inter) based on vertical overlap (see the 
 [original model](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2019.00383/full)
 for more details).  These depth ranges were typical depth ranges, not record
